@@ -1,23 +1,23 @@
 import { Drawer, List, ListItemIcon, ListItemButton } from '@mui/material';
 import {
-  Dashboard as DashboardIcon,
-  TableChart as TableChartIcon,
-  Receipt as ReceiptIcon,
-  Language as LanguageIcon,
-  Notifications as NotificationsIcon,
-  AccountCircle as AccountCircleIcon,
+  Dashboard,
+  TableChart, 
+  Receipt ,
+  Language ,
+  Notifications, 
+  AccountCircle 
 } from '@mui/icons-material';
 import { Box } from '@mui/system';
 import { Link, useLocation } from 'react-router-dom';
 
-// Define the menu items in a more concise format
+
 const menuItems = [
-  { path: '/Dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
-  { path: '/Analytics', label: 'Analytics', icon: <TableChartIcon /> },
-  { path: '/Tools', label: 'Tools', icon: <ReceiptIcon /> },
-  { path: '/SendSms', label: 'Send Sms', icon: <LanguageIcon /> },
-  { path: '/SmsHistory', label: 'Sms History', icon: <NotificationsIcon /> },
-  { path: '/Notification', label: 'Notification', icon: <AccountCircleIcon /> },
+  { path: '/Dashboard', label: 'Dashboard', icon: <Dashboard /> },
+  { path: '/Analytics', label: 'Analytics', icon: <TableChart /> },
+  { path: '/Tools', label: 'Tools', icon: <Receipt /> },
+  { path: '/SendSms', label: 'Send Sms', icon: <Language /> },
+  { path: '/SmsHistory', label: 'Sms History', icon: <Notifications /> },
+  { path: '/Notification', label: 'Notification', icon: <AccountCircle /> },
 ];
 
 const SidePanel = () => {

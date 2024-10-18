@@ -14,14 +14,14 @@ import SendSms from './pages/SendSms.jsx';
 import Analytics from './pages/Analytics.jsx';
 import SmsHistory from './pages/SmsHistory.jsx';
 import PageNotFound from './pages/PageNotFound.jsx';
-const baseUrl="project-main-eosin.vercel.app"
+
 const router=createBrowserRouter([
   {
     path:'/',
     element:<div>Hello mate</div>
   },
   {
-    path:`${baseUrl}/dashboard`,
+    path:`/dashboard`,
     element:<Dashboard/>
   },
   {

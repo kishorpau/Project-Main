@@ -1,6 +1,6 @@
 
 
-import { Drawer, List, ListItem, ListItemIcon, Button } from '@mui/material';
+import { Drawer, List, ListItem, ListItemIcon, Button,Link } from '@mui/material';
 import DashboardIcon from '@mui/icons-material/Dashboard';
 import TableChartIcon from '@mui/icons-material/TableChart';
 import ReceiptIcon from '@mui/icons-material/Receipt';
@@ -38,9 +38,9 @@ const SidePanel= () => {
             <ListItemIcon sx={{ color: '#fff' }}>
               <DashboardIcon />
             </ListItemIcon>
-            <Button variant="contained" sx={{ backgroundColor: '#FF5722', color: '#fff' }}>
+            <Link href="/Dashboard"><Button variant="contained" sx={{ backgroundColor: '#FF5722', color: '#fff' }}>
               
-            Dashboard</Button>
+              Dashboard</Button></Link>
           </ListItem>
 
           
@@ -48,7 +48,7 @@ const SidePanel= () => {
             <ListItemIcon sx={{ color: '#fff' }}>
               <TableChartIcon />
             </ListItemIcon>
-            <Button variant="contained">Analytics</Button>
+            <Link href="/Analytics"><Button variant="contained">Analytics</Button></Link>
           </ListItem>
 
           
@@ -56,7 +56,7 @@ const SidePanel= () => {
             <ListItemIcon sx={{ color: '#fff' }}>
               <ReceiptIcon />
             </ListItemIcon>
-            <Button variant="contained">Tools</Button>
+            <Link href="/Tools"><Button variant="contained">Tools</Button></Link>
           </ListItem>
 
         
@@ -64,7 +64,7 @@ const SidePanel= () => {
             <ListItemIcon sx={{ color: '#fff' }}>
               <LanguageIcon />
             </ListItemIcon>
-            <Button variant="contained">Send Sms</Button>
+            <Link href="/SendSms"><Button variant="contained">Send Sms</Button></Link>
           </ListItem>
 
           
@@ -72,7 +72,7 @@ const SidePanel= () => {
             <ListItemIcon sx={{ color: '#fff' }}>
               <NotificationsIcon />
             </ListItemIcon>
-            <Button variant="contained">Sms History</Button>
+           <Link href="/SmsHistory"><Button variant="contained">Sms History</Button></Link> 
           </ListItem>
 
        
@@ -80,7 +80,7 @@ const SidePanel= () => {
             <ListItemIcon sx={{ color: '#fff' }}>
               <AccountCircleIcon />
             </ListItemIcon>
-            <Button variant="contained">Notification</Button>
+           <Link href="/Notification"><Button variant="contained">Notification</Button></Link>
           </ListItem>
 
           

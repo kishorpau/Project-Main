@@ -1,15 +1,29 @@
-
-
-import { Drawer, List, ListItem, ListItemIcon, Button,Link } from '@mui/material';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import TableChartIcon from '@mui/icons-material/TableChart';
-import ReceiptIcon from '@mui/icons-material/Receipt';
-import LanguageIcon from '@mui/icons-material/Language';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import { Drawer, List, ListItemIcon, ListItemButton } from '@mui/material';
+import {
+  Dashboard as DashboardIcon,
+  TableChart as TableChartIcon,
+  Receipt as ReceiptIcon,
+  Language as LanguageIcon,
+  Notifications as NotificationsIcon,
+  AccountCircle as AccountCircleIcon,
+} from '@mui/icons-material';
 import { Box } from '@mui/system';
+import { Link, useLocation } from 'react-router-dom';
 
-const SidePanel= () => {
+// Define the menu items in a more concise format
+const menuItems = [
+  { path: '/Dashboard', label: 'Dashboard', icon: <DashboardIcon /> },
+  { path: '/Analytics', label: 'Analytics', icon: <TableChartIcon /> },
+  { path: '/Tools', label: 'Tools', icon: <ReceiptIcon /> },
+  { path: '/SendSms', label: 'Send Sms', icon: <LanguageIcon /> },
+  { path: '/SmsHistory', label: 'Sms History', icon: <NotificationsIcon /> },
+  { path: '/Notification', label: 'Notification', icon: <AccountCircleIcon /> },
+];
+
+const SidePanel = () => {
+  const location = useLocation();
+  const isActive = (path) => location.pathname === path;
+
   return (
     <Drawer
       variant="permanent"
@@ -21,6 +35,10 @@ const SidePanel= () => {
           boxSizing: 'border-box',
           backgroundColor: '#333',
           color: '#fff',
+          height: '90vh',
+          marginY: '5vh',
+          marginLeft: '1%',
+          borderRadius: '20px',
         },
       }}
     >
@@ -33,60 +51,15 @@ const SidePanel= () => {
         }}
       >
         <List>
-          
-          <ListItem button>
-            <ListItemIcon sx={{ color: '#fff' }}>
-              <DashboardIcon />
-            </ListItemIcon>
-            <Link href="/Dashboard"><Button variant="contained" sx={{ backgroundColor: '#FF5722', color: '#fff' }}>
-              
-              Dashboard</Button></Link>
-          </ListItem>
-
-          
-          <ListItem button>
-            <ListItemIcon sx={{ color: '#fff' }}>
-              <TableChartIcon />
-            </ListItemIcon>
-            <Link href="/Analytics"><Button variant="contained">Analytics</Button></Link>
-          </ListItem>
-
-          
-          <ListItem button>
-            <ListItemIcon sx={{ color: '#fff' }}>
-              <ReceiptIcon />
-            </ListItemIcon>
-            <Link href="/Tools"><Button variant="contained">Tools</Button></Link>
-          </ListItem>
-
-        
-          <ListItem button>
-            <ListItemIcon sx={{ color: '#fff' }}>
-              <LanguageIcon />
-            </ListItemIcon>
-            <Link href="/SendSms"><Button variant="contained">Send Sms</Button></Link>
-          </ListItem>
-
-          
-          <ListItem button>
-            <ListItemIcon sx={{ color: '#fff' }}>
-              <NotificationsIcon />
-            </ListItemIcon>
-           <Link href="/SmsHistory"><Button variant="contained">Sms History</Button></Link> 
-          </ListItem>
-
-       
-          <ListItem button>
-            <ListItemIcon sx={{ color: '#fff' }}>
-              <AccountCircleIcon />
-            </ListItemIcon>
-           <Link href="/Notification"><Button variant="contained">Notification</Button></Link>
-          </ListItem>
-
-          
+          {menuItems.map(({ path, label, icon }) => (
+            <Link to={path} key={path} style={{ textDecoration: 'none' }}>
+              <ListItemButton selected={isActive(path)} sx={{ color: 'white', fontSize: '16px' }}>
+                <ListItemIcon sx={{ color: '#fff' }}>{icon}</ListItemIcon>
+                {label}
+              </ListItemButton>
+            </Link>
+          ))}
         </List>
-
-       
       </Box>
     </Drawer>
   );

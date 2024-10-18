@@ -18,7 +18,7 @@ import PageNotFound from './pages/PageNotFound.jsx';
 const router=createBrowserRouter([
   {
     path:'/',
-    element:<div>Hello mate</div>
+    element:<Dashboard/>
   },
   {
     path:'/dashboard',

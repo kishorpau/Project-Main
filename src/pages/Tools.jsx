@@ -1,9 +1,12 @@
 import SelectAllTransferList from "../components/SelectAllTransferList";
 import SidePanel from "../components/SidePanel";
 import { Box, Button, Typography } from "@mui/material";
-
+import Navbar from "../components/Navbar"
 const Tools = () => {
   return (
+    <>
+    <Navbar/>
+    
     <Box
       component="section"
       sx={{
@@ -28,6 +31,7 @@ const Tools = () => {
         <SelectAllTransferList />
       </Box>
     </Box>
+    </>
   );
 };
 

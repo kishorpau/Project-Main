@@ -20,30 +20,7 @@ const router=createBrowserRouter([
     path:'/',
     element:<div>Hello mate</div>
   },
-  {
-    path:`/dashboard`,
-    element:<Dashboard/>
-  },
-  {
-    path:'/analytics',
-    element:<Analytics/>
-  },
-  {
-    path:'/sendsms',
-    element:<SendSms/>
-  },
-  {
-    path:'/smshistory',
-    element:<SmsHistory/>
-  },
-  {
-    path:'/tools',
-    element:<Tools/>
-  },
-  {
-    path:'*',
-    element:<PageNotFound/>
-  }
+  
 ])
 
 createRoot(document.getElementById('root')).render(

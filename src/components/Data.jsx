@@ -11,19 +11,24 @@ import {
     TablePagination,
     Typography,
     Checkbox,
+    Toolbar,
+    IconButton,
+    Tooltip,
 } from '@mui/material';
+import DeleteIcon from '@mui/icons-material/Delete';
+import { alpha } from '@mui/material/styles';
 import useFetch from '../hooks/useFetch';
 
-const Data = ({ selection = false }) => {
-    const { data, loading, error } = useFetch('https://jsonplaceholder.typicode.com/comments');
+const Data = ({ select = false, setSelectedData }) => {
+    const { data, loading, error, setData } = useFetch('https://jsonplaceholder.typicode.com/comments');
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(0);
-    const [rowsPerPage, setRowsPerPage] = useState(5);
-    const [selectedRows, setSelectedRows] = useState([]);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [selected, setSelected] = useState([]);
 
-    // Memoize filtered data
+    // Ensure data is an array before filtering
     const filteredData = useMemo(() => {
-        if (!Array.isArray(data)) return [];
+        if (!data || !Array.isArray(data)) return [];
         const lowercasedSearchTerm = searchTerm.toLowerCase();
         return data.filter(item =>
             item.name.toLowerCase().includes(lowercasedSearchTerm) ||
@@ -31,40 +36,67 @@ const Data = ({ selection = false }) => {
         );
     }, [data, searchTerm]);
 
-    // Limit the number of displayed items to 10,000
-    const limitedDataCount = Math.min(filteredData.length, 10000);
-
-    // Memoize paginated data based on filtered data
+    // Pagination logic
     const paginatedData = useMemo(() => {
         return filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
     }, [filteredData, page, rowsPerPage]);
 
+    // Handle page change
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
     };
 
+    // Handle rows per page change
     const handleChangeRowsPerPage = (event) => {
         setRowsPerPage(parseInt(event.target.value, 10));
-        setPage(0); // Reset to first page on rows per page change
+        setPage(0);
     };
 
-    const handleRowSelect = (item) => {
-        setSelectedRows((prev) => {
-            if (prev.includes(item.id)) {
-                return prev.filter(id => id !== item.id); // Deselect if already selected
-            } else {
-                return [...prev, item.id]; // Select if not selected
-            }
-        });
-    };
-
-    // Reset page to 0 whenever filtered data changes or when rows per page changes
-    useEffect(() => {
-        const totalPages = Math.ceil(limitedDataCount / rowsPerPage);
-        if (page >= totalPages) {
-            setPage(totalPages > 0 ? totalPages - 1 : 0); // Set to the last valid page index or reset to 0
+    // Handle select all click
+    const handleSelectAllClick = (event) => {
+        if (event.target.checked) {
+            const newSelected = paginatedData.map((n) => n.id);
+            setSelected(newSelected);
+            return;
         }
-    }, [filteredData, rowsPerPage, page]); // Trigger effect when filtered data, rows per page, or page changes
+        setSelected([]);
+    };
+
+    // Handle individual row selection
+    const handleClick = (event, id) => {
+        const selectedIndex = selected.indexOf(id);
+        let newSelected = [];
+
+        if (selectedIndex === -1) {
+            newSelected = newSelected.concat(selected, id);
+        } else if (selectedIndex === 0) {
+            newSelected = newSelected.concat(selected.slice(1));
+        } else if (selectedIndex === selected.length - 1) {
+            newSelected = newSelected.concat(selected.slice(0, -1));
+        } else if (selectedIndex > 0) {
+            newSelected = newSelected.concat(selected.slice(0, selectedIndex), selected.slice(selectedIndex + 1));
+        }
+
+        setSelected(newSelected);
+    };
+
+    // Handle delete action
+    const handleDelete = () => {
+        const updatedData = data.filter(item => !selected.includes(item.id));
+        setData(updatedData);
+        setSelected([]);
+    };
+
+    // Check if an item is selected
+    const isSelected = (id) => selected.indexOf(id) !== -1;
+
+    // Pass selected data to parent component
+    useEffect(() => {
+        if (select && setSelectedData) {
+            const selectedItems = data.filter(item => selected.includes(item.id));
+            setSelectedData(selectedItems);
+        }
+    }, [selected, data, select, setSelectedData]);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error loading data. Please try again later.</div>;
@@ -81,11 +113,49 @@ const Data = ({ selection = false }) => {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 sx={{ marginBottom: '20px' }}
             />
+
+            <Toolbar
+                sx={{
+                    pl: { sm: 2 },
+                    pr: { xs: 1, sm: 1 },
+                    ...(selected.length > 0 && {
+                        bgcolor: (theme) => alpha(theme.palette.primary.main, theme.palette.action.activatedOpacity),
+                    }),
+                }}
+            >
+                {selected.length > 0 ? (
+                    <Typography sx={{ flex: '1 1 100%' }} color="inherit" variant="subtitle1" component="div">
+                        {selected.length} selected
+                    </Typography>
+                ) : (
+                    <Typography sx={{ flex: '1 1 100%' }} variant="h6" component="div">
+                        Comments
+                    </Typography>
+                )}
+                {selected.length > 0 ? (
+                    <Tooltip title="Delete">
+                        <IconButton onClick={handleDelete}>
+                            <DeleteIcon />
+                        </IconButton>
+                    </Tooltip>
+                ) : null}
+            </Toolbar>
+
             <TableContainer>
                 <Table stickyHeader>
                     <TableHead>
                         <TableRow>
-                            {selection && <TableCell />}
+                            <TableCell padding="checkbox">
+                                <Checkbox
+                                    color="primary"
+                                    indeterminate={selected.length > 0 && selected.length < paginatedData.length}
+                                    checked={paginatedData.length > 0 && selected.length === paginatedData.length}
+                                    onChange={handleSelectAllClick}
+                                    inputProps={{
+                                        'aria-label': 'select all comments',
+                                    }}
+                                />
+                            </TableCell>
                             <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff' }}>ID</TableCell>
                             <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff' }}>Name</TableCell>
                             <TableCell sx={{ fontWeight: 'bold', backgroundColor: '#1976d2', color: '#fff' }}>Email</TableCell>
@@ -94,32 +164,38 @@ const Data = ({ selection = false }) => {
                     </TableHead>
                     <TableBody>
                         {paginatedData.length > 0 ? (
-                            paginatedData.map((item) => (
-                                <TableRow
-                                    key={item.id}
-                                    sx={{
-                                        '&:nth-of-type(odd)': { backgroundColor: '#f2f2f2' },
-                                        cursor: selection ? 'pointer' : 'default',
-                                    }}
-                                    onClick={() => selection && handleRowSelect(item)}
-                                >
-                                    {selection && (
+                            paginatedData.map((item) => {
+                                const isItemSelected = isSelected(item.id);
+                                return (
+                                    <TableRow
+                                        hover
+                                        onClick={(event) => handleClick(event, item.id)}
+                                        role="checkbox"
+                                        aria-checked={isItemSelected}
+                                        tabIndex={-1}
+                                        key={item.id}
+                                        selected={isItemSelected}
+                                        sx={{ cursor: 'pointer' }}
+                                    >
                                         <TableCell padding="checkbox">
                                             <Checkbox
-                                                checked={selectedRows.includes(item.id)}
-                                                onChange={() => handleRowSelect(item)}
+                                                color="primary"
+                                                checked={isItemSelected}
+                                                inputProps={{
+                                                    'aria-labelledby': `enhanced-table-checkbox-${item.id}`,
+                                                }}
                                             />
                                         </TableCell>
-                                    )}
-                                    <TableCell>{item.id}</TableCell>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell>{item.email}</TableCell>
-                                    <TableCell>{item.body}</TableCell>
-                                </TableRow>
-                            ))
+                                        <TableCell>{item.id}</TableCell>
+                                        <TableCell>{item.name}</TableCell>
+                                        <TableCell>{item.email}</TableCell>
+                                        <TableCell>{item.body}</TableCell>
+                                    </TableRow>
+                                );
+                            })
                         ) : (
                             <TableRow>
-                                <TableCell colSpan={selection ? 5 : 4} align="center">
+                                <TableCell colSpan={5} align="center">
                                     No results found
                                 </TableCell>
                             </TableRow>
@@ -130,7 +206,7 @@ const Data = ({ selection = false }) => {
             <TablePagination
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={limitedDataCount}
+                count={filteredData.length}
                 rowsPerPage={rowsPerPage}
                 page={page}
                 onPageChange={handleChangePage}

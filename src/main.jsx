@@ -15,6 +15,7 @@ import Notification from './pages/Notification';
 import SendSms from './pages/SendSms';
 import SmsHistory from './pages/SmsHistory';
 import Tools from './pages/Tools';
+import Auth from './pages/Auth';
 
 
 const router=createBrowserRouter([
@@ -49,6 +50,10 @@ const router=createBrowserRouter([
   {
     path:'/SmsHistory',
     element:<SmsHistory/>
+  },
+  {
+    path:'/Auth',
+    element:<Auth/>
   },
   
 ])

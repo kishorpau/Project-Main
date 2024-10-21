@@ -10,7 +10,7 @@ import {
 } from "react-router-dom";
 import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
-import Calender from './pages/Calender';
+import Calendar from './pages/Calendar';
 import Notification from './pages/Notification';
 import SendSms from './pages/SendSms';
 import SmsHistory from './pages/SmsHistory';
@@ -27,8 +27,8 @@ const router=createBrowserRouter([
     element:<Dashboard/>
   },
   {
-    path:'/Calender',
-    element:<Calender/>
+    path:'/Calendar',
+    element:<Calendar/>
   },
   {
     path:'/Analytics',

@@ -1,84 +1,76 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Drawer from '@mui/material/Drawer';
-import Button from '@mui/material/Button';
-import List from '@mui/material/List';
-import Divider from '@mui/material/Divider';
-import ListItem from '@mui/material/ListItem';
-import ListItemButton from '@mui/material/ListItemButton';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MenuIcon from '@mui/icons-material/Menu';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import React, { useState } from 'react';
+import { Box, Drawer, Button, List, Divider, ListItem, ListItemButton, ListItemIcon, ListItemText, useMediaQuery } from '@mui/material';
+import { Menu as MenuIcon, MoveToInbox as InboxIcon, Mail as MailIcon } from '@mui/icons-material';
+import { Link, useLocation } from 'react-router-dom';
 
 export default function ResponsiveDrawer() {
-  const [isDrawerOpen, setDrawerOpen] = React.useState(false);
-  const isLargeScreen = useMediaQuery('(min-width:600px)'); 
+  const [isDrawerOpen, setDrawerOpen] = useState(false);
+  const isLargeScreen = useMediaQuery('(min-width:600px)');
+  const location = useLocation();
 
   const toggleDrawer = (open) => (event) => {
-    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-      return;
-    }
+    if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) return;
     setDrawerOpen(open);
   };
 
-  const list = (
-    <Box
-      sx={{ width: 250,}}
-      role="presentation"
-      onClick={toggleDrawer(false)}
-      onKeyDown={toggleDrawer(false)}
-    >
-      <List>
-        {['Dashboard', 'Analytics', 'Tools', 'Send Sms','Sms History','Calender','Notification'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
+  const pages = ['Dashboard', 'Analytics', 'Tools', 'SendSms', 'SmsHistory', 'Calendar', 'Notification'];
+  const additionalItems = ['All mail', 'Trash', 'Spam'];
+
+  const getPath = (text) => `/${text}`.toLowerCase();
+  const isActivePath = (path) => location.pathname.toLowerCase() === path;
+
+  const renderListItems = (items) =>
+    items.map((text, index) => {
+      const path = getPath(text);
+      const isActive = isActivePath(path);
+      return (
+        <Link key={text} to={path} style={{ textDecoration: 'none', color: 'inherit' }}>
+          <ListItem disablePadding>
+            <ListItemButton sx={{ backgroundColor: isActive ? 'red' : 'transparent',
+
+'&:hover': {
+    backgroundColor:isActive?'red':'transparent',}
+
+             }}>
               <ListItemIcon>
                 {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
               </ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
           </ListItem>
-        ))}
-      </List>
+        </Link>
+      );
+    });
+
+  const drawerContent = (
+    <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)} onKeyDown={toggleDrawer(false)}>
+      <List>{renderListItems(pages)}</List>
       <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
+      <List>{renderListItems(additionalItems)}</List>
     </Box>
   );
 
   return (
     <div>
       {!isLargeScreen && (
-        <Button onClick={toggleDrawer(true)}><MenuIcon /> Menu</Button>
+        <Button onClick={toggleDrawer(true)}>
+          <MenuIcon /> Menu
+        </Button>
       )}
       <Drawer
-        anchor={'left'}
-        open={isLargeScreen || isDrawerOpen}  
+        anchor="left"
+        open={isLargeScreen || isDrawerOpen}
         onClose={toggleDrawer(false)}
-        variant={isLargeScreen ? "persistent" : "temporary"} 
+        variant={isLargeScreen ? 'persistent' : 'temporary'}
         PaperProps={{
           sx: {
-            height: '80vh', 
-            top: '10vh',      
-            position: 'fixed'
-          }
+            height: '80vh',
+            top: '10vh',
+            position: 'fixed',
+          },
         }}
-      
       >
-        {list}
+        {drawerContent}
       </Drawer>
     </div>
   );

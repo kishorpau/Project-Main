@@ -26,7 +26,7 @@ export default function ResponsiveDrawer() {
       return (
         <Link key={text} to={path} style={{ textDecoration: 'none', color: 'black' }}>
           <ListItem disablePadding>
-            <ListItemButton sx={{ backgroundColor: isActive ? '#304C50' : 'transparent', color:isActive ? 'white':'black',
+            <ListItemButton sx={{ backgroundColor: isActive ? '#2f575b' : 'transparent', color:isActive ? 'white':'black',
 
 '&:hover': {
     backgroundColor:isActive?'#1A393D':'transparent',}

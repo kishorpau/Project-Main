@@ -11,7 +11,7 @@ import {
 import Dashboard from './pages/Dashboard';
 import Analytics from './pages/Analytics';
 import Calendar from './pages/Calendar';
-import Notification from './pages/Notification';
+import Data from './pages/SendSms'
 import SendSms from './pages/SendSms';
 import SmsHistory from './pages/SmsHistory';
 import Tools from './pages/Tools';
@@ -40,8 +40,8 @@ const router=createBrowserRouter([
     element:<Tools/>
   },
   {
-    path:'/Notification',
-    element:<Notification/>
+    path:'/Data',
+    element:<Data/>
   },
   {
     path:'/SendSms',

@@ -1,7 +1,8 @@
-import Data from "./components/Data"
+import Data from "./components/DummyData"
 import { Typography,Box, Button } from "@mui/material"
 import SmsIcon from "@mui/icons-material/Sms"
 import { Link } from "react-router-dom"
+
 const App = () => {
  
   return (
@@ -25,6 +26,7 @@ const App = () => {
       Sign Up
     </Button>
     </Link>
+    
   </Box>
   )
 }

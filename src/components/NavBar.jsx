@@ -12,11 +12,14 @@ import Button from '@mui/material/Button';
 import Tooltip from '@mui/material/Tooltip';
 import MenuItem from '@mui/material/MenuItem';
 import SmsIcon from '@mui/icons-material/Sms';
+import { AccountCircleRounded } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const pages = ['Resources', 'Contact Us', 'Blog'];
 const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
 
 function NavBar() {
+  const navigate = useNavigate(); // Initialize useNavigate
   const [anchorElNav, setAnchorElNav] = React.useState(null);
   const [anchorElUser, setAnchorElUser] = React.useState(null);
 
@@ -31,12 +34,16 @@ function NavBar() {
     setAnchorElNav(null);
   };
 
-  const handleCloseUserMenu = () => {
-    setAnchorElUser(null);
+  const handleCloseUserMenu = (setting) => {
+    if (setting === 'Logout') {
+      // Navigate to the home page when logging out
+      navigate('/'); // Redirect to home
+    }
+    setAnchorElUser(null); // Close the user menu
   };
 
   return (
-    <AppBar position="static" sx={{backgroundColor:"#024950"}}>
+    <AppBar position="static" sx={{ backgroundColor: "#024950" }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <SmsIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -83,7 +90,7 @@ function NavBar() {
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none', } }}
+              sx={{ display: { xs: 'block', md: 'none' } }}
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>
@@ -125,7 +132,7 @@ function NavBar() {
           <Box sx={{ flexGrow: 0 }}>
             <Tooltip title="Open settings">
               <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <AccountCircleRounded sx={{ fontSize: "larger", color: "white" }} />
               </IconButton>
             </Tooltip>
             <Menu
@@ -145,7 +152,7 @@ function NavBar() {
               onClose={handleCloseUserMenu}
             >
               {settings.map((setting) => (
-                <MenuItem key={setting} onClick={handleCloseUserMenu}>
+                <MenuItem key={setting} onClick={() => handleCloseUserMenu(setting)}>
                   <Typography sx={{ textAlign: 'center' }}>{setting}</Typography>
                 </MenuItem>
               ))}
@@ -156,4 +163,5 @@ function NavBar() {
     </AppBar>
   );
 }
+
 export default NavBar;

@@ -2,7 +2,7 @@ import AnchorTemporaryDrawer from "../components/AnchorTemporaryDrawer";
 import NavBar from "../components/NavBar";
 import { Button, Card, CardContent, Typography, Modal, Box } from "@mui/material";
 import { useState } from "react";
-import Data from "../components/Data";
+import Data from "../components/DummyData";
 
 const Tools = () => {
     const [open, setOpen] = useState(false);

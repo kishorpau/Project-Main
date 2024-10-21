@@ -19,7 +19,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import { alpha } from '@mui/material/styles';
 import useFetch from '../hooks/useFetch';
 
-const Data = ({ select = false, setSelectedData }) => {
+const DummyData = ({ select = false, setSelectedData }) => {
     const { data, loading, error, setData } = useFetch('https://jsonplaceholder.typicode.com/comments');
     const [searchTerm, setSearchTerm] = useState('');
     const [page, setPage] = useState(0);
@@ -217,4 +217,4 @@ const Data = ({ select = false, setSelectedData }) => {
     );
 };
 
-export default Data;
+export default DummyData;

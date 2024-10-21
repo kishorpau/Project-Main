@@ -13,7 +13,7 @@ export default function ResponsiveDrawer() {
     setDrawerOpen(open);
   };
 
-  const pages = ['Dashboard', 'Analytics', 'Tools', 'SendSms', 'SmsHistory', 'Calendar', 'Notification'];
+  const pages = ['Dashboard', 'Analytics', 'Tools', 'SendSms', 'SmsHistory', 'Calendar', 'Data'];
   const additionalItems = ['All mail', 'Trash', 'Spam'];
 
   const getPath = (text) => `/${text}`.toLowerCase();
@@ -53,7 +53,7 @@ export default function ResponsiveDrawer() {
   return (
     <div>
       {!isLargeScreen && (
-        <Button onClick={toggleDrawer(true)}>
+        <Button onClick={toggleDrawer(true)} variant='text' sx={{color:'#2f575b'}}>
           Menu
         </Button>
       )}

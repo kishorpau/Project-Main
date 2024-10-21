@@ -41,8 +41,9 @@ const Auth = () => {
       justifyContent="center"
       alignItems="center"
       height="100vh"
+      backgroundColor="#194549"
     >
-      <Card sx={{ maxWidth: 400 }}>
+      <Card sx={{ maxWidth: 400,backgroundColor:"#fff" }}>
         <CardContent>
           <Typography variant="h5" component="div" gutterBottom>
             Sign In
@@ -68,13 +69,14 @@ const Auth = () => {
               label="Password"
               margin="normal"
               variant="outlined"
+              
               type="password"
               {...register('password', { required: 'Password is required' })}
               error={!!errors.password}
               helperText={errors.password ? errors.password.message : ''}
             />
             <CardActions>
-              <Button type="submit" variant="contained" color="primary">
+              <Button type="submit" variant="contained" sx={{backgroundColor:"#2f575b"}}>
                 Sign In
               </Button>
             </CardActions>

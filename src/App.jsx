@@ -5,7 +5,7 @@ const App = () => {
   return (
     <>
     <div>
-      <Data />
+      Welcome to Bulk Sms Sign Up Here
     </div>
     </>
   )

@@ -24,12 +24,12 @@ export default function ResponsiveDrawer() {
       const path = getPath(text);
       const isActive = isActivePath(path);
       return (
-        <Link key={text} to={path} style={{ textDecoration: 'none', color: 'inherit' }}>
+        <Link key={text} to={path} style={{ textDecoration: 'none', color: 'black' }}>
           <ListItem disablePadding>
-            <ListItemButton sx={{ backgroundColor: isActive ? 'red' : 'transparent',
+            <ListItemButton sx={{ backgroundColor: isActive ? '#304C50' : 'transparent', color:isActive ? 'white':'black',
 
 '&:hover': {
-    backgroundColor:isActive?'red':'transparent',}
+    backgroundColor:isActive?'#1A393D':'transparent',}
 
              }}>
               <ListItemIcon>
@@ -54,7 +54,7 @@ export default function ResponsiveDrawer() {
     <div>
       {!isLargeScreen && (
         <Button onClick={toggleDrawer(true)}>
-          <MenuIcon /> Menu
+          Menu
         </Button>
       )}
       <Drawer

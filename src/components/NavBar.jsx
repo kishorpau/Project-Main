@@ -36,7 +36,7 @@ function NavBar() {
   };
 
   return (
-    <AppBar position="static">
+    <AppBar position="static" sx={{backgroundColor:"#024950"}}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <SmsIcon sx={{ display: { xs: 'none', md: 'flex' }, mr: 1 }} />
@@ -83,7 +83,7 @@ function NavBar() {
               }}
               open={Boolean(anchorElNav)}
               onClose={handleCloseNavMenu}
-              sx={{ display: { xs: 'block', md: 'none' } }}
+              sx={{ display: { xs: 'block', md: 'none', } }}
             >
               {pages.map((page) => (
                 <MenuItem key={page} onClick={handleCloseNavMenu}>

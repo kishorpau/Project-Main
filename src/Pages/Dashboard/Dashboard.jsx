@@ -13,10 +13,9 @@ const Dashboard = () => {
   return (
     <>
       <NavBar />
+      <LeftSideNav />
       <Box sx={styles.mainContainer}>
-        <Box component="aside" sx={styles.sidebar}>
-          <LeftSideNav />
-        </Box>
+        <Box component="aside" sx={styles.sidebar}></Box>
 
         <Box component="main" sx={styles.contentArea}>
           <Box sx={styles.card}>

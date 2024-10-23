@@ -1,65 +1,11 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { StrictMode } from "react";
+import { createRoot } from "react-dom/client";
+import { router } from "./route";
+import { RouterProvider } from "react-router-dom";
+import "./styles/index.css";
 
-import './index.css'
-import App from './App';
-import {
-  createBrowserRouter,
-  RouterProvider,
-  
-} from "react-router-dom";
-import Dashboard from './pages/Dashboard';
-import Analytics from './pages/Analytics';
-import Calendar from './pages/Calendar';
-import Data from './pages/SendSms'
-import SendSms from './pages/SendSms';
-import SmsHistory from './pages/SmsHistory';
-import Tools from './pages/Tools';
-import Auth from './pages/Auth';
-
-
-const router=createBrowserRouter([
-  {
-    path:'/',
-    element:<App/>
-  },
-  {
-    path:'/Dashboard',
-    element:<Dashboard/>
-  },
-  {
-    path:'/Calendar',
-    element:<Calendar/>
-  },
-  {
-    path:'/Analytics',
-    element:<Analytics/>
-  },
-  {
-    path:'/Tools',
-    element:<Tools/>
-  },
-  {
-    path:'/Data',
-    element:<Data/>
-  },
-  {
-    path:'/SendSms',
-    element:<SendSms/>
-  },
-  {
-    path:'/SmsHistory',
-    element:<SmsHistory/>
-  },
-  {
-    path:'/Auth',
-    element:<Auth/>
-  },
-  
-])
-
-createRoot(document.getElementById('root')).render(
+createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <RouterProvider router={router}/>
-  </StrictMode>,
-)
+    <RouterProvider router={router} />
+  </StrictMode>
+);

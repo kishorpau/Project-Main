@@ -1,16 +1,16 @@
 import LeftSideNav from "../../components/LeftSideNav/LeftSideNav";
 import NavBar from "../../components/NavBar/NavBar";
-import SendSmsData from "./SendSmsData";
+import FormGroupData from "./FormGroupData";
 
-const SendSms = () => {
+const Groups = () => {
   return (
     <>
       <NavBar />
       <LeftSideNav>
-        <SendSmsData />
+        <FormGroupData />
       </LeftSideNav>
     </>
   );
 };
 
-export default SendSms;
+export default Groups;

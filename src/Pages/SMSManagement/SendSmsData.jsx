@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -9,6 +9,8 @@ import Paper from "@mui/material/Paper";
 import Typography from "@mui/material/Typography";
 import { TableVirtuoso } from "react-virtuoso";
 import TextField from "@mui/material/TextField";
+import { Close as CloseIcon } from "@mui/icons-material";
+import { TablePagination } from "@mui/material";
 import {
   Box,
   Button,
@@ -20,37 +22,18 @@ import {
 import { useForm } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-
-const mockData = [
-  {
-    id: 1,
-    fullName: "John Doe",
-    phone: "123-456-7890",
-    email: "john@example.com",
-    alternativePhone: "987-654-3210",
-    designation: "Manager",
-    photo: "https://via.placeholder.com/50",
-  },
-  {
-    id: 2,
-    fullName: "Jane Smith",
-    phone: "234-567-8901",
-    email: "jane@example.com",
-    alternativePhone: "876-543-2109",
-    designation: "Supervisor",
-    photo: "https://via.placeholder.com/50",
-  },
-];
+import useFetch from "../../hooks/useFetch";
+import SendSMSModal from "../../components/SendSMSModal/SendSMSModal";
 
 const columns = [
   { width: 50, label: "Select", dataKey: "select" },
   { width: 50, label: "ID", dataKey: "id" },
-  { width: 100, label: "Photo", dataKey: "photo" },
-  { width: 150, label: "Full Name", dataKey: "fullName" },
-  { width: 150, label: "Phone", dataKey: "phone" },
-  { width: 200, label: "Email", dataKey: "email" },
-  { width: 150, label: "Alt. Phone", dataKey: "alternativePhone" },
-  { width: 150, label: "Designation", dataKey: "designation" },
+  { width: 100, label: "Photo", dataKey: "Column 1" },
+  { width: 150, label: "Full Name", dataKey: "Column 2" },
+  { width: 150, label: "Phone", dataKey: "Column 3" },
+  { width: 200, label: "Email", dataKey: "Column 4" },
+  { width: 150, label: "Alt. Phone", dataKey: "Column 5" },
+  { width: 150, label: "Designation", dataKey: "Column 6" },
   { width: 100, label: "Actions", dataKey: "actions" },
 ];
 
@@ -73,51 +56,49 @@ const VirtuosoTableComponents = {
   )),
 };
 
-function fixedHeaderContent(selectAllChecked, handleSelectAll) {
+function fixedHeaderContent({ allSelected, toggleSelectAll }) {
   return (
     <TableRow sx={{ backgroundColor: "#024950" }}>
-      <TableCell padding="checkbox">
-        <Checkbox
-          indeterminate={selectAllChecked === "partial"}
-          checked={selectAllChecked === "all"}
-          onChange={handleSelectAll}
-        />
-      </TableCell>
-      {columns.slice(1).map((column) => (
+      {columns.map((column, index) => (
         <TableCell
           key={column.dataKey}
           align="left"
-          sx={{ width: column.width, color: "#fff" }}
+          sx={{
+            width: column.width,
+            color: "#fff",
+            minHeight: "30px",
+            padding: "0.75%",
+          }}
         >
           {column.label}
+          {column.dataKey === "select" && (
+            <Checkbox
+              checked={allSelected}
+              onChange={toggleSelectAll}
+              color="default"
+            />
+          )}
         </TableCell>
       ))}
     </TableRow>
   );
 }
 
-function rowContent(
-  _index,
-  row,
-  selectedUsers,
-  handleSelect,
-  handleDelete,
-  handleEdit
-) {
+function rowContent(index, row, handleDelete, handleEdit, handleSelectUser) {
   return (
     <>
-      <TableCell padding="checkbox">
-        <Checkbox
-          checked={selectedUsers.includes(row.id)}
-          onChange={() => handleSelect(row.id)}
-        />
-      </TableCell>
-      {columns.slice(1).map((column) => (
+      {columns.map((column) => (
         <TableCell key={column.dataKey} align="left">
-          {column.dataKey === "photo" ? (
+          {column.dataKey === "select" ? (
+            <Checkbox
+              checked={row.selected || false}
+              onChange={() => handleSelectUser(row)}
+              color="default"
+            />
+          ) : column.dataKey === "Column 1" ? (
             <img
-              src={row[column.dataKey]}
-              alt={row.fullName}
+              src={row["Column 1"]}
+              alt={row["Column 2"]}
               style={{ width: "50px", borderRadius: "50%" }}
             />
           ) : column.dataKey === "actions" ? (
@@ -138,52 +119,56 @@ function rowContent(
   );
 }
 
-export default function CombinedTable() {
+export default function SendSmsData() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState(mockData);
-  const [selectedUsers, setSelectedUsers] = useState([]);
   const [open, setOpen] = useState(false);
-  const [editingData, setEditingData] = useState(null);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [smsMessage, setSmsMessage] = useState("");
+  const [editingData, setEditingData] = useState(null);
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [selectedUsers, setSelectedUsers] = useState([]);
+  const [uploadedImage, setUploadedImage] = useState(null);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const { register, handleSubmit, reset, setValue } = useForm();
 
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm]);
+
+  const { data, loading, error, createData, updateData, deleteData } = useFetch(
+    "https://retoolapi.dev/hsSJ5B/data"
+  );
+
   const handleDelete = (id) => {
-    setData((prevData) => prevData.filter((item) => item.id !== id));
-    setSelectedUsers((prevSelected) =>
-      prevSelected.filter((userId) => userId !== id)
-    );
+    deleteData(id);
   };
 
   const handleEdit = (row) => {
     setEditingData(row);
     setOpen(true);
-    setValue("fullName", row.fullName);
-    setValue("phoneNumber", row.phone);
-    setValue("email", row.email);
-    setValue("altPhone", row.alternativePhone);
-    setValue("designation", row.designation);
+    setValue("fullName", row["Column 2"]);
+    setValue("phoneNumber", row["Column 3"]);
+    setValue("email", row["Column 4"]);
+    setValue("altPhone", row["Column 5"]);
+    setValue("designation", row["Column 6"]);
   };
 
-  const onSubmit = (formData) => {
+  const onSubmit = async (formData) => {
     const newData = {
-      id: editingData ? editingData.id : data.length + 1,
-      fullName: formData.fullName,
-      phone: formData.phoneNumber,
-      email: formData.email,
-      alternativePhone: formData.altPhone || "N/A",
-      designation: formData.designation,
-      photo: formData.photo || "https://via.placeholder.com/50",
+      "Column 2": formData.fullName,
+      "Column 3": formData.phoneNumber,
+      "Column 4": formData.email,
+      "Column 5": formData.altPhone || "N/A",
+      "Column 6": formData.designation,
+      "Column 1":
+        uploadedImage || formData.photo || "https://via.placeholder.com/50",
     };
 
     if (editingData) {
-      setData((prevData) =>
-        prevData.map((item) => (item.id === editingData.id ? newData : item))
-      );
-      setEditingData(null);
+      await updateData(editingData.id, newData);
     } else {
-      setData((prevData) => [...prevData, newData]);
+      await createData(newData);
     }
 
     reset();
@@ -196,210 +181,232 @@ export default function CombinedTable() {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setValue("photo", reader.result);
+        setUploadedImage(reader.result);
       };
       reader.readAsDataURL(file);
     }
   };
 
-  const handleSelect = (id) => {
-    setSelectedUsers((prevSelected) =>
-      prevSelected.includes(id)
-        ? prevSelected.filter((userId) => userId !== id)
-        : [...prevSelected, id]
-    );
+  const handleSelectUser = (user) => {
+    setSelectedUsers((prev) => {
+      if (prev.some((u) => u.id === user.id)) {
+        return prev.filter((u) => u.id !== user.id);
+      }
+      return [...prev, user];
+    });
   };
 
-  const handleSelectAll = () => {
-    if (selectedUsers.length === data.length) {
-      setSelectedUsers([]);
-    } else {
-      setSelectedUsers(data.map((user) => user.id));
-    }
+  const toggleSelectAll = () => {
+    setSelectedUsers(allSelected ? [] : [...filteredRows]);
   };
 
-  const handleOpenSmsModal = () => {
-    setSmsModalOpen(true);
-  };
+  const filteredRows = useMemo(() => {
+    return data
+      .map((row) => ({
+        ...row,
+        selected: selectedUsers.some((u) => u.id === row.id),
+      }))
+      .filter((row) => {
+        const fullName = row["Column 2"] ? row["Column 2"].toLowerCase() : "";
+        const phone = row["Column 3"] || "";
+        const alternativePhone = row["Column 5"] || "";
+        return (
+          fullName.includes(searchTerm.toLowerCase()) ||
+          phone.includes(searchTerm) ||
+          alternativePhone.includes(searchTerm)
+        );
+      });
+  }, [data, searchTerm, selectedUsers]);
 
-  const handleCloseSmsModal = () => {
-    setSmsModalOpen(false);
-  };
+  const paginatedData = useMemo(() => {
+    const start = page * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredRows.slice(start, end);
+  }, [filteredRows, page, rowsPerPage]);
 
-  const handleSendSMSMessage = () => {
-    const selectedUserData = data.filter((user) =>
-      selectedUsers.includes(user.id)
-    );
-    console.log("Sending SMS:", smsMessage, "to:", selectedUserData);
-    setSmsModalOpen(false);
-    setSnackbarOpen(true);
-  };
-
+  const handleOpen = () => setOpen(true);
   const handleClose = () => {
     setOpen(false);
     setEditingData(null);
   };
+  const handleSnackbarClose = () => setSnackbarOpen(false);
 
-  const filteredData = data.filter(
-    (row) =>
-      row.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      row.phone.includes(searchTerm) ||
-      row.alternativePhone.includes(searchTerm)
-  );
+  const handleOpenSmsModal = () => setSmsModalOpen(true);
+  const handleCloseSmsModal = () => setSmsModalOpen(false);
 
-  const selectAllChecked =
-    selectedUsers.length === 0
-      ? false
-      : selectedUsers.length === data.length
-      ? "all"
-      : "partial";
+  const handleSendSMSMessage = () => {
+    selectedUsers.forEach((user) =>
+      console.log(`Sending SMS to ${user["Column 2"]}: ${smsMessage}`)
+    );
+    setSmsModalOpen(false);
+    setSnackbarOpen(true);
+  };
+
+  const allSelected =
+    selectedUsers.length === filteredRows.length && selectedUsers.length > 0;
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
-    <Box sx={{ height: 500, width: "100%", mt: "2%" }}>
+    <Box sx={{ height: 500, width: "100%" }}>
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", padding: "2%" }}
+        sx={{
+          display: "flex",
+          gap: "40%",
+        }}
       >
-        <Typography variant="h6">DATA Table</Typography>
-        <Button
-          variant="contained"
-          onClick={handleOpenSmsModal}
-          sx={{ backgroundColor: "#2f575b" }}
-          disabled={selectedUsers.length === 0}
-        >
-          Send SMS
-        </Button>
-      </Box>
-
-      <TextField
-        label="Search by Full Name or Phone Number"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      <Modal open={smsModalOpen} onClose={handleCloseSmsModal}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: 400,
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            borderRadius: 1,
-          }}
-        >
-          <Typography variant="h6" gutterBottom>
-            Send SMS to Selected Users
-          </Typography>
-          <TextField
-            label="SMS Message"
-            multiline
-            rows={4}
-            fullWidth
-            value={smsMessage}
-            onChange={(e) => setSmsMessage(e.target.value)}
-            sx={{ mb: 2 }}
-          />
+        <Typography variant="h5" color="#2f575b">
+          List of Persons
+        </Typography>
+        <Box sx={{ display: "flex", gap: "2%" }}>
           <Button
             variant="contained"
-            onClick={handleSendSMSMessage}
-            fullWidth
-            sx={{ backgroundColor: "#2f575b" }}
+            onClick={handleOpen}
+            sx={{
+              backgroundColor: "#2f575b",
+              height: "70%",
+              width: "50%",
+              marginTop: "1%",
+            }}
           >
-            Send SMS
+            {editingData ? "Edit Person" : "Add new person"}
           </Button>
+          <Button
+            variant="contained"
+            onClick={handleOpenSmsModal}
+            sx={{
+              backgroundColor: "#2f575b",
+              height: "70%",
+              width: "50%",
+              marginTop: "1%",
+            }}
+          >
+            Send SMS to Selected
+          </Button>
+          <TextField
+            label="Search..."
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{
+              height: "70%",
+              width: "100%",
+              marginBottom: "1%",
+            }}
+          />
         </Box>
-      </Modal>
+      </Box>
 
-      <Paper style={{ height: 400, width: "100%" }}>
-        <TableVirtuoso
-          data={filteredData}
-          components={VirtuosoTableComponents}
-          fixedHeaderContent={() =>
-            fixedHeaderContent(selectAllChecked, handleSelectAll)
-          }
-          itemContent={(_index, row) =>
-            rowContent(
-              _index,
-              row,
-              selectedUsers,
-              handleSelect,
-              handleDelete,
-              handleEdit
-            )
-          }
-        />
-      </Paper>
-
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open}>
         <Box
-          sx={{ p: 3, backgroundColor: "white", margin: "auto", width: 400 }}
+          sx={{
+            p: 3,
+            backgroundColor: "white",
+            margin: "auto",
+            width: 400,
+          }}
         >
-          <Typography variant="h6">
-            {editingData ? "Edit Data" : "Add New Data"}
-          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6">
+              {editingData ? "Edit User" : "Add User"}
+            </Typography>
+            <IconButton onClick={handleClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
           <form onSubmit={handleSubmit(onSubmit)}>
             <TextField
               label="Full Name"
+              variant="outlined"
               fullWidth
+              {...register("fullName")}
+              required
               margin="normal"
-              {...register("fullName", { required: true })}
             />
             <TextField
               label="Phone Number"
+              variant="outlined"
               fullWidth
+              {...register("phoneNumber")}
+              required
               margin="normal"
-              {...register("phoneNumber", { required: true })}
             />
             <TextField
               label="Email"
+              variant="outlined"
               fullWidth
+              {...register("email")}
+              required
               margin="normal"
-              {...register("email", { required: true })}
             />
             <TextField
               label="Alternative Phone"
+              variant="outlined"
               fullWidth
-              margin="normal"
               {...register("altPhone")}
+              margin="normal"
             />
             <TextField
               label="Designation"
+              variant="outlined"
               fullWidth
+              {...register("designation")}
+              required
               margin="normal"
-              {...register("designation", { required: true })}
             />
-            <Button variant="outlined" component="label" fullWidth>
-              Upload Photo
-              <input
-                type="file"
-                onChange={handleFileChange}
-                accept="image/*"
-                hidden
-              />
-            </Button>
+            <input type="file" accept="image/*" onChange={handleFileChange} />
             <Button
-              variant="contained"
-              fullWidth
               type="submit"
-              sx={{ backgroundColor: "#2f575b", mt: 2 }}
+              variant="contained"
+              sx={{ backgroundColor: "#024950", marginTop: "10px" }}
             >
-              {editingData ? "Update" : "Submit"}
+              {editingData ? "Update User" : "Add User"}
             </Button>
           </form>
         </Box>
       </Modal>
 
+      <Paper style={{ height: 500, width: "100%" }}>
+        <TableVirtuoso
+          data={paginatedData}
+          components={VirtuosoTableComponents}
+          fixedHeaderContent={() =>
+            fixedHeaderContent({ allSelected, toggleSelectAll })
+          }
+          itemContent={(index, row) =>
+            rowContent(index, row, handleDelete, handleEdit, handleSelectUser)
+          }
+        />
+        <TablePagination
+          component="div"
+          count={filteredRows.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
+
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
-        onClose={() => setSnackbarOpen(false)}
-        message="Action performed successfully"
+        onClose={handleSnackbarClose}
+        message="Action successful!"
+      />
+
+      <SendSMSModal
+        smsModalOpen={smsModalOpen}
+        smsMessage={smsMessage}
+        handleCloseSmsModal={handleCloseSmsModal}
+        handleSendSMSMessage={handleSendSMSMessage}
+        setSmsMessage={setSmsMessage}
       />
     </Box>
   );

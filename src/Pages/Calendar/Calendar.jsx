@@ -7,7 +7,6 @@ import NavBar from "../../components/NavBar/NavBar";
 const Calendar = () => {
   return (
     <>
-      {" "}
       <NavBar />
       <LeftSideNav />
       <LocalizationProvider dateAdapter={AdapterDayjs}>

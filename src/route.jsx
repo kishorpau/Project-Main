@@ -1,9 +1,9 @@
 import { createBrowserRouter } from "react-router-dom";
-import App from "../App";
+import App from "../src/App";
 import Dashboard from "./Pages/Dashboard/Dashboard";
 import Analytics from "./Pages/Dashboard/Analytics";
 import Calendar from "./Pages/Calendar/Calendar";
-import Tools from "./Pages/Tools/Tools";
+import Groups from "./Pages/Groups/Groups";
 import SendSms from "./Pages/SMSManagement/SendSms";
 import SmsHistory from "./Pages/SMSManagement/SmsHistory";
 import Auth from "./Pages/Auth/Auth";
@@ -27,8 +27,8 @@ export const router = createBrowserRouter([
     element: <Analytics />,
   },
   {
-    path: "/Tools",
-    element: <Tools />,
+    path: "/Groups",
+    element: <Groups />,
   },
 
   {

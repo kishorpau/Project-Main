@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   Box,
   Card,
@@ -9,12 +9,12 @@ import {
   Typography,
   Snackbar,
   Alert,
-} from '@mui/material';
-import { useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
-  const navigate = useNavigate(); 
+  const navigate = useNavigate();
   const {
     register,
     handleSubmit,
@@ -25,10 +25,10 @@ const Auth = () => {
 
   const onSubmit = (data) => {
     console.log(data);
-    setOpenSnackbar(true); 
+    setOpenSnackbar(true);
     setTimeout(() => {
-      navigate('/dashboard'); 
-    }, 1000); 
+      navigate("/dashboard");
+    }, 1000);
   };
 
   const handleCloseSnackbar = () => {
@@ -40,10 +40,9 @@ const Auth = () => {
       display="flex"
       justifyContent="center"
       alignItems="center"
-      height="100vh"
       backgroundColor="#194549"
     >
-      <Card sx={{ maxWidth: 400,backgroundColor:"#fff" }}>
+      <Card sx={{ maxWidth: 400, backgroundColor: "#fff" }}>
         <CardContent>
           <Typography variant="h5" component="div" gutterBottom>
             Sign In
@@ -54,29 +53,32 @@ const Auth = () => {
               label="Email"
               margin="normal"
               variant="outlined"
-              {...register('email', {
-                required: 'Email is required',
+              {...register("email", {
+                required: "Email is required",
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: 'Invalid email address',
+                  message: "Invalid email address",
                 },
               })}
               error={!!errors.email}
-              helperText={errors.email ? errors.email.message : ''}
+              helperText={errors.email ? errors.email.message : ""}
             />
             <TextField
               fullWidth
               label="Password"
               margin="normal"
               variant="outlined"
-              
               type="password"
-              {...register('password', { required: 'Password is required' })}
+              {...register("password", { required: "Password is required" })}
               error={!!errors.password}
-              helperText={errors.password ? errors.password.message : ''}
+              helperText={errors.password ? errors.password.message : ""}
             />
             <CardActions>
-              <Button type="submit" variant="contained" sx={{backgroundColor:"#2f575b"}}>
+              <Button
+                type="submit"
+                variant="contained"
+                sx={{ backgroundColor: "#2f575b" }}
+              >
                 Sign In
               </Button>
             </CardActions>
@@ -84,8 +86,16 @@ const Auth = () => {
         </CardContent>
       </Card>
 
-      <Snackbar open={openSnackbar} autoHideDuration={6000} onClose={handleCloseSnackbar}>
-        <Alert onClose={handleCloseSnackbar} severity="success" sx={{ width: '100%' }}>
+      <Snackbar
+        open={openSnackbar}
+        autoHideDuration={6000}
+        onClose={handleCloseSnackbar}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
           Sign in successful!
         </Alert>
       </Snackbar>

@@ -20,7 +20,9 @@ import {
   menuButtonStyles,
 } from "./LeftSideNavStyles";
 
-export default function LeftSideNav() {
+const drawerWidth = 180;
+
+export default function LeftSideNav({ children }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const location = useLocation();
@@ -45,7 +47,7 @@ export default function LeftSideNav() {
         <Link key={text} to={fullpath} style={linkStyles}>
           <ListItem disablePadding>
             <ListItemButton sx={listItemButtonStyles(isActive)}>
-              <ListItemIcon>{icon}</ListItemIcon>
+              <ListItemIcon sx={{ minWidth: 40 }}>{icon}</ListItemIcon>
               <ListItemText primary={text} />
             </ListItemButton>
           </ListItem>
@@ -55,7 +57,7 @@ export default function LeftSideNav() {
 
   const drawerContent = (
     <Box
-      sx={{ width: 250 }}
+      sx={{ width: drawerWidth }}
       role="presentation"
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
@@ -66,7 +68,7 @@ export default function LeftSideNav() {
   );
 
   return (
-    <div>
+    <Box sx={{ display: "flex" }}>
       {!isLargeScreen && (
         <Button
           onClick={toggleDrawer(true)}
@@ -87,6 +89,18 @@ export default function LeftSideNav() {
       >
         {drawerContent}
       </Drawer>
-    </div>
+
+      <Box
+        component="main"
+        sx={{
+          flexGrow: 1,
+          padding: "1rem",
+          marginLeft: { sm: `${drawerWidth}px` },
+          transition: "margin-left 0.3s",
+        }}
+      >
+        {children}
+      </Box>
+    </Box>
   );
 }

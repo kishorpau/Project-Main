@@ -1,6 +1,6 @@
-import { Typography, Box, Button } from "@mui/material";
+import { Typography, Box } from "@mui/material";
 import SmsIcon from "@mui/icons-material/Sms";
-import { Link } from "react-router-dom";
+import Auth from "./Pages/Auth/Auth";
 
 const App = () => {
   return (
@@ -17,14 +17,7 @@ const App = () => {
       <Typography align="center" variant="h4">
         <SmsIcon /> Welcome to Bulk Sms
       </Typography>
-      <Link to="/Auth">
-        <Button
-          variant="contained"
-          sx={{ color: "white", backgroundColor: "#2f575b", fontWeight: "500" }}
-        >
-          Sign Up
-        </Button>
-      </Link>
+      <Auth />
     </Box>
   );
 };

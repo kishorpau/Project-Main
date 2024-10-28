@@ -5,7 +5,7 @@ const SmsHistory = () => {
   return (
     <>
       <NavBar />
-      <LeftSideNav />
+      <LeftSideNav></LeftSideNav>
     </>
   );
 };

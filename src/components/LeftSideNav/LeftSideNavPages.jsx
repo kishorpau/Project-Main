@@ -9,7 +9,7 @@ export const LeftSideNavPages = [
   { text: "Dashboard", path: "Dashboard", icon: <DashboardIcon /> },
   { text: "Analytics", path: "Analytics", icon: <AnalyticsIcon /> },
   { text: "Add a Person", path: "PersonForm", icon: <PersonAddIcon /> },
-  { text: "Tools", path: "Tools", icon: <ToolsIcon /> },
+  { text: "Groups", path: "Groups", icon: <ToolsIcon /> },
   { text: "Send Sms", path: "SendSms", icon: <SendSmsIcon /> },
   { text: "Sms History", path: "SmsHistory", icon: <SmsHistoryIcon /> },
   { text: "Calendar", path: "Calendar", icon: <CalendarIcon /> },

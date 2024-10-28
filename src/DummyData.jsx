@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect, useMemo } from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -13,37 +13,20 @@ import { Box, Button, Snackbar, IconButton, Modal } from "@mui/material";
 import { useForm } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
-
-const mockData = [
-  {
-    id: 1,
-    fullName: "John Doe",
-    phone: "123-456-7890",
-    email: "john@example.com",
-    alternativePhone: "987-654-3210",
-    designation: "Manager",
-    photo: "https://via.placeholder.com/50",
-  },
-  {
-    id: 2,
-    fullName: "Jane Smith",
-    phone: "234-567-8901",
-    email: "jane@example.com",
-    alternativePhone: "876-543-2109",
-    designation: "Supervisor",
-    photo: "https://via.placeholder.com/50",
-  },
-];
-
+import { read, utils, writeFileXLSX } from "xlsx";
+import { Sms } from "@mui/icons-material";
+import useFetch from "./hooks/useFetch";
+import { Close as CloseIcon } from "@mui/icons-material";
+import { TablePagination } from "@mui/material";
+import SendSMSModal from "./components/SendSMSModal/SendSMSModal";
 const columns = [
   { width: 50, label: "ID", dataKey: "id" },
-  { width: 100, label: "Photo", dataKey: "photo" },
-  { width: 150, label: "Full Name", dataKey: "fullName" },
-  { width: 150, label: "Phone", dataKey: "phone" },
-  { width: 200, label: "Email", dataKey: "email" },
-  { width: 150, label: "Alt. Phone", dataKey: "alternativePhone" },
-  { width: 150, label: "Designation", dataKey: "designation" },
-
+  { width: 100, label: "Photo", dataKey: "Column 1" },
+  { width: 150, label: "Full Name", dataKey: "Column 2" },
+  { width: 150, label: "Phone", dataKey: "Column 3" },
+  { width: 200, label: "Email", dataKey: "Column 4" },
+  { width: 150, label: "Alt. Phone", dataKey: "Column 5" },
+  { width: 150, label: "Designation", dataKey: "Column 6" },
   { width: 100, label: "Actions", dataKey: "actions" },
 ];
 
@@ -82,15 +65,15 @@ function fixedHeaderContent() {
   );
 }
 
-function rowContent(_index, row, handleDelete, handleEdit) {
+function rowContent(_index, row, handleDelete, handleEdit, handleOpenSmsModal) {
   return (
     <>
       {columns.map((column) => (
         <TableCell key={column.dataKey} align="left">
-          {column.dataKey === "photo" ? (
+          {column.dataKey === "Column 1" ? (
             <img
-              src={row[column.dataKey]}
-              alt={row.fullName}
+              src={row["Column 1"]}
+              alt={row["Column 2"]}
               style={{ width: "50px", borderRadius: "50%" }}
             />
           ) : column.dataKey === "actions" ? (
@@ -100,6 +83,9 @@ function rowContent(_index, row, handleDelete, handleEdit) {
               </IconButton>
               <IconButton onClick={() => handleDelete(row.id)}>
                 <DeleteIcon />
+              </IconButton>
+              <IconButton onClick={() => handleOpenSmsModal(row)}>
+                <Sms />
               </IconButton>
             </Box>
           ) : (
@@ -113,44 +99,53 @@ function rowContent(_index, row, handleDelete, handleEdit) {
 
 export default function DummyData() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [data, setData] = useState(mockData);
   const [open, setOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [smsModalOpen, setSmsModalOpen] = useState(false);
+  const [smsMessage, setSmsMessage] = useState("");
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [editingData, setEditingData] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const { register, handleSubmit, reset, setValue } = useForm();
 
+  useEffect(() => {
+    setPage(0);
+  }, [searchTerm]);
+
+  const { data, createData, updateData, deleteData } = useFetch(
+    "https://retoolapi.dev/hsSJ5B/data"
+  );
+
   const handleDelete = (id) => {
-    setData((prevData) => prevData.filter((item) => item.id !== id));
+    deleteData(id);
   };
 
   const handleEdit = (row) => {
     setEditingData(row);
     setOpen(true);
-    setValue("fullName", row.fullName);
-    setValue("phoneNumber", row.phone);
-    setValue("email", row.email);
-    setValue("altPhone", row.alternativePhone);
-    setValue("designation", row.designation);
+    setValue("fullName", row["Column 2"]);
+    setValue("phoneNumber", row["Column 3"]);
+    setValue("email", row["Column 4"]);
+    setValue("altPhone", row["Column 5"]);
+    setValue("designation", row["Column 6"]);
+    setValue("photo", row["Column 1"]);
   };
 
-  const onSubmit = (formData) => {
+  const onSubmit = async (formData) => {
     const newData = {
-      id: editingData ? editingData.id : data.length + 1,
-      fullName: formData.fullName,
-      phone: formData.phoneNumber,
-      email: formData.email,
-      alternativePhone: formData.altPhone || "N/A",
-      designation: formData.designation,
-      photo: formData.photo || "https://via.placeholder.com/50",
+      "Column 2": formData.fullName,
+      "Column 3": formData.phoneNumber,
+      "Column 4": formData.email,
+      "Column 5": formData.altPhone || "N/A",
+      "Column 6": formData.designation,
+      "Column 1": formData.photo || "https://via.placeholder.com/50",
     };
 
     if (editingData) {
-      setData((prevData) =>
-        prevData.map((item) => (item.id === editingData.id ? newData : item))
-      );
-      setEditingData(null);
+      await updateData(editingData.id, newData);
     } else {
-      setData((prevData) => [...prevData, newData]);
+      await createData(newData);
     }
 
     reset();
@@ -169,12 +164,23 @@ export default function DummyData() {
     }
   };
 
-  const filteredRows = data.filter(
-    (row) =>
-      row.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      row.phone.includes(searchTerm) ||
-      row.alternativePhone.includes(searchTerm)
-  );
+  const filteredRows = useMemo(() => {
+    return data.filter((row) => {
+      const fullName = row["Column 2"] ? row["Column 2"].toLowerCase() : "";
+      const phone = row["Column 3"] || "";
+      const alternativePhone = row["Column 5"] || "";
+      return (
+        fullName.includes(searchTerm.toLowerCase()) ||
+        phone.includes(searchTerm) ||
+        alternativePhone.includes(searchTerm)
+      );
+    });
+  }, [data, searchTerm]);
+  const paginatedData = useMemo(() => {
+    const start = page * rowsPerPage;
+    const end = start + rowsPerPage;
+    return filteredRows.slice(start, end);
+  }, [filteredRows, page, rowsPerPage]);
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => {
@@ -182,27 +188,100 @@ export default function DummyData() {
     setEditingData(null);
   };
   const handleSnackbarClose = () => setSnackbarOpen(false);
+  const handleOpenSmsModal = (user) => {
+    setSelectedUser(user);
+    setSmsModalOpen(true);
+  };
+
+  const handleCloseSmsModal = () => {
+    setSmsModalOpen(false);
+  };
+
+  const handleSendSMSMessage = () => {
+    console.log(`Sending SMS to ${selectedUser["Column 2"]}: ${smsMessage}`);
+    setSmsModalOpen(false);
+    setSnackbarOpen(true);
+  };
+
+  const exportFile = useCallback(() => {
+    const ws = utils.json_to_sheet(data);
+    const wb = utils.book_new();
+    utils.book_append_sheet(wb, ws, "Data");
+    writeFileXLSX(wb, "DummyData.xlsx");
+  }, [data]);
+
+  const handleChangePage = (event, newPage) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   return (
-    <Box sx={{ height: 500, width: "100%", mt: "2%" }}>
+    <Box sx={{ height: 500, width: "100%" }}>
       <Box
-        sx={{ display: "flex", justifyContent: "space-between", padding: "2%" }}
+        sx={{
+          display: "flex",
+          gap: "45%",
+        }}
       >
-        <Typography variant="h6">DATA Table</Typography>
-        <Button
-          variant="contained"
-          onClick={handleOpen}
-          sx={{ backgroundColor: "#2f575b" }}
-        >
-          {editingData ? "Edit Person" : "Add new person"}
-        </Button>
+        <Typography variant="h5" color="#2f575b">
+          List of Persons
+        </Typography>
+        <Box sx={{ display: "flex", gap: "2%" }}>
+          <Button
+            variant="contained"
+            onClick={handleOpen}
+            sx={{
+              backgroundColor: "#2f575b",
+              height: "70%",
+              width: "40%",
+              marginTop: "1%",
+            }}
+          >
+            {editingData ? "Edit Person" : "Add new person"}
+          </Button>
+          <Button
+            variant="contained"
+            onClick={exportFile}
+            sx={{
+              backgroundColor: "#2f575b",
+              height: "70%",
+              width: "40%",
+              marginTop: "1%",
+            }}
+          >
+            Export Data
+          </Button>
+          <TextField
+            label="Search..."
+            variant="outlined"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            sx={{ height: "70%", width: "100%" }}
+          />
+        </Box>
       </Box>
 
-      <Modal open={open} onClose={handleClose}>
+      <Modal open={open}>
         <Box
-          sx={{ p: 3, backgroundColor: "white", margin: "auto", width: 400 }}
+          sx={{
+            p: 3,
+            backgroundColor: "white",
+            margin: "auto",
+            width: 400,
+          }}
         >
-          <Typography variant="h5">User Information Form</Typography>
+          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+            <Typography variant="h6">
+              {editingData ? "Edit User" : "Add User"}
+            </Typography>
+            <IconButton onClick={handleClose}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
           <form onSubmit={handleSubmit(onSubmit)}>
             <TextField
               label="Full Name"
@@ -212,36 +291,29 @@ export default function DummyData() {
               required
               margin="normal"
             />
-
             <TextField
               label="Phone Number"
               variant="outlined"
               fullWidth
               {...register("phoneNumber")}
               required
-              type="tel"
               margin="normal"
             />
-
             <TextField
               label="Email"
               variant="outlined"
               fullWidth
               {...register("email")}
               required
-              type="email"
               margin="normal"
             />
-
             <TextField
               label="Alternative Phone"
               variant="outlined"
               fullWidth
               {...register("altPhone")}
-              type="tel"
               margin="normal"
             />
-
             <TextField
               label="Designation"
               variant="outlined"
@@ -250,52 +322,50 @@ export default function DummyData() {
               required
               margin="normal"
             />
-
-            <Button variant="outlined" component="label" fullWidth>
-              Upload Photo
-              <input
-                type="file"
-                onChange={handleFileChange}
-                accept="image/*"
-                hidden
-              />
-            </Button>
-
+            <input type="file" accept="image/*" onChange={handleFileChange} />
             <Button
-              variant="contained"
               type="submit"
-              sx={{ mt: 2, backgroundColor: "#2f575b" }}
-              fullWidth
+              variant="contained"
+              sx={{ backgroundColor: "#024950", marginTop: "10px" }}
             >
-              {editingData ? "Save Changes" : "Submit"}
+              {editingData ? "Update User" : "Add User"}
             </Button>
           </form>
         </Box>
       </Modal>
 
-      <TextField
-        label="Search by Full Name or Phone Number"
-        variant="outlined"
-        fullWidth
-        margin="normal"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-
-      <TableVirtuoso
-        data={filteredRows}
-        components={VirtuosoTableComponents}
-        fixedHeaderContent={fixedHeaderContent}
-        itemContent={(_index, row) =>
-          rowContent(_index, row, handleDelete, handleEdit)
-        }
-      />
+      <Paper style={{ height: 500, width: "100%" }}>
+        <TableVirtuoso
+          data={paginatedData}
+          components={VirtuosoTableComponents}
+          fixedHeaderContent={fixedHeaderContent}
+          itemContent={(index, row) =>
+            rowContent(index, row, handleDelete, handleEdit, handleOpenSmsModal)
+          }
+        />
+        <TablePagination
+          component="div"
+          count={data.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
+        />
+      </Paper>
 
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        message="Operation successful!"
+        message="Action successful!"
+      />
+
+      <SendSMSModal
+        smsModalOpen={smsModalOpen}
+        smsMessage={smsMessage}
+        handleCloseSmsModal={handleCloseSmsModal}
+        handleSendSMSMessage={handleSendSMSMessage}
+        setSmsMessage={setSmsMessage}
       />
     </Box>
   );

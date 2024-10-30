@@ -3,6 +3,7 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { Box } from "@mui/material";
 import styles from "../DashboardComponents/SMSCostCardStyle";
+import CountUp from "react-countup";
 
 export default function SMSCostCard() {
   const TotalSMSCredit = 7000;
@@ -16,7 +17,7 @@ export default function SMSCostCard() {
             कुल SMS क्रेडिट
           </Typography>
           <Typography variant="body1" sx={styles.body}>
-            {TotalSMSCredit}
+            <CountUp end={TotalSMSCredit} duration={2} />
           </Typography>
         </CardContent>
       </Card>
@@ -27,7 +28,7 @@ export default function SMSCostCard() {
             SMS क्रेडिट खर्च भयो
           </Typography>
           <Typography variant="body1" sx={styles.body}>
-            {SpentSMSCredit}
+            <CountUp end={SpentSMSCredit} duration={2} />
           </Typography>
         </CardContent>
       </Card>
@@ -38,7 +39,7 @@ export default function SMSCostCard() {
             बाँकी SMS क्रेडिट
           </Typography>
           <Typography variant="body1" sx={styles.body}>
-            {TotalSMSCredit - SpentSMSCredit}
+            <CountUp end={TotalSMSCredit - SpentSMSCredit} duration={2} />
           </Typography>
         </CardContent>
       </Card>

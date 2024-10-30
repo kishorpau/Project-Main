@@ -3,7 +3,7 @@ import { Assessment as AnalyticsIcon } from "@mui/icons-material";
 import { Build as ToolsIcon } from "@mui/icons-material";
 import { Sms as SendSmsIcon } from "@mui/icons-material";
 import { History as SmsHistoryIcon } from "@mui/icons-material";
-import { CalendarToday as CalendarIcon } from "@mui/icons-material";
+import ApartmentIcon from "@mui/icons-material/Apartment";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 export const LeftSideNavPages = [
   { text: "Dashboard", path: "Dashboard", icon: <DashboardIcon /> },
@@ -12,5 +12,5 @@ export const LeftSideNavPages = [
   { text: "Groups", path: "Groups", icon: <ToolsIcon /> },
   { text: "Send Sms", path: "SendSms", icon: <SendSmsIcon /> },
   { text: "Sms History", path: "SmsHistory", icon: <SmsHistoryIcon /> },
-  { text: "Calendar", path: "Calendar", icon: <CalendarIcon /> },
+  { text: "Office", path: "OfficeAdmin", icon: <ApartmentIcon /> },
 ];

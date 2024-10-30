@@ -63,7 +63,6 @@ export default function LeftSideNav({ children }) {
       onKeyDown={toggleDrawer(false)}
     >
       <List>{renderListItems(LeftSideNavPages)}</List>
-      <Divider />
     </Box>
   );
 
@@ -94,7 +93,7 @@ export default function LeftSideNav({ children }) {
         component="main"
         sx={{
           flexGrow: 1,
-          padding: "1rem",
+          padding: "0.5rem",
           marginLeft: { sm: `${drawerWidth}px` },
           transition: "margin-left 0.3s",
         }}

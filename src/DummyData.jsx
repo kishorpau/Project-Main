@@ -10,18 +10,27 @@ import Typography from "@mui/material/Typography";
 import { TableVirtuoso } from "react-virtuoso";
 import TextField from "@mui/material/TextField";
 import { Box, Button, Snackbar, IconButton, Modal } from "@mui/material";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { read, utils, writeFileXLSX } from "xlsx";
 import { Sms } from "@mui/icons-material";
 import useFetch from "./hooks/useFetch";
 import { Close as CloseIcon } from "@mui/icons-material";
-import { TablePagination } from "@mui/material";
+import { TablePagination, Chip, Switch } from "@mui/material";
 import SendSMSModal from "./components/SendSMSModal/SendSMSModal";
+import DeleteModal from "./components/DeleteModal/DeleteModal";
+import {
+  emailRequired,
+  emailInvalid,
+  phoneRequired,
+  phoneInvalid,
+  DesignationRequired,
+} from "../src/utils/constants/form/index";
 const columns = [
-  { width: 50, label: "ID", dataKey: "id" },
+  { width: 40, label: "ID", dataKey: "id" },
   { width: 100, label: "Photo", dataKey: "Column 1" },
+  { width: 100, label: "Status", dataKey: "Status" },
   { width: 150, label: "Full Name", dataKey: "Column 2" },
   { width: 150, label: "Phone", dataKey: "Column 3" },
   { width: 200, label: "Email", dataKey: "Column 4" },
@@ -77,17 +86,32 @@ function rowContent(_index, row, handleDelete, handleEdit, handleOpenSmsModal) {
               style={{ width: "50px", borderRadius: "50%" }}
             />
           ) : column.dataKey === "actions" ? (
-            <Box>
+            <Box
+              sx={{
+                minWidth: "100px",
+                display: "flex",
+                justifyContent: "space-evenly",
+              }}
+            >
               <IconButton onClick={() => handleEdit(row)}>
                 <EditIcon />
-              </IconButton>
-              <IconButton onClick={() => handleDelete(row.id)}>
-                <DeleteIcon />
               </IconButton>
               <IconButton onClick={() => handleOpenSmsModal(row)}>
                 <Sms />
               </IconButton>
+              <IconButton onClick={() => handleDelete(row.id)}>
+                <DeleteIcon />
+              </IconButton>
             </Box>
+          ) : column.dataKey === "Status" ? (
+            <Chip
+              label={row.Status ? "Active" : "Inactive"}
+              color={row.Status ? "success" : "default"}
+              sx={{
+                backgroundColor: row.Status ? "success.main" : "#f44336",
+                color: "white",
+              }}
+            />
           ) : (
             row[column.dataKey]
           )}
@@ -107,7 +131,9 @@ export default function DummyData() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [editingData, setEditingData] = useState(null);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
+  const { register, handleSubmit, reset, setValue, control } = useForm();
 
   useEffect(() => {
     setPage(0);
@@ -118,7 +144,18 @@ export default function DummyData() {
   );
 
   const handleDelete = (id) => {
-    deleteData(id);
+    setUserIdToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteData(userIdToDelete);
+    setDeleteModalOpen(false);
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setUserIdToDelete(null);
   };
 
   const handleEdit = (row) => {
@@ -129,6 +166,7 @@ export default function DummyData() {
     setValue("email", row["Column 4"]);
     setValue("altPhone", row["Column 5"]);
     setValue("designation", row["Column 6"]);
+    setValue("Status", row["Status"]);
     setValue("photo", row["Column 1"]);
   };
 
@@ -139,18 +177,24 @@ export default function DummyData() {
       "Column 4": formData.email,
       "Column 5": formData.altPhone || "N/A",
       "Column 6": formData.designation,
+      Status: formData.Status,
       "Column 1": formData.photo || "https://via.placeholder.com/50",
     };
 
-    if (editingData) {
-      await updateData(editingData.id, newData);
-    } else {
-      await createData(newData);
-    }
+    try {
+      if (editingData) {
+        await updateData(editingData.id, newData);
+      } else {
+        await createData(newData);
+      }
 
-    reset();
-    handleClose();
-    setSnackbarOpen(true);
+      setSnackbarOpen(true);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+    } finally {
+      reset();
+      handleClose();
+    }
   };
 
   const handleFileChange = (event) => {
@@ -186,6 +230,7 @@ export default function DummyData() {
   const handleClose = () => {
     setOpen(false);
     setEditingData(null);
+    reset();
   };
   const handleSnackbarClose = () => setSnackbarOpen(false);
   const handleOpenSmsModal = (user) => {
@@ -198,7 +243,6 @@ export default function DummyData() {
   };
 
   const handleSendSMSMessage = () => {
-    console.log(`Sending SMS to ${selectedUser["Column 2"]}: ${smsMessage}`);
     setSmsModalOpen(false);
     setSnackbarOpen(true);
   };
@@ -224,7 +268,8 @@ export default function DummyData() {
       <Box
         sx={{
           display: "flex",
-          gap: "45%",
+          justifyContent: "space-between",
+          padding: "1%",
         }}
       >
         <Typography variant="h5" color="#2f575b">
@@ -234,11 +279,10 @@ export default function DummyData() {
           <Button
             variant="contained"
             onClick={handleOpen}
+            size="small"
             sx={{
               backgroundColor: "#2f575b",
-              height: "70%",
-              width: "40%",
-              marginTop: "1%",
+              width: "80%",
             }}
           >
             {editingData ? "Edit Person" : "Add new person"}
@@ -246,11 +290,10 @@ export default function DummyData() {
           <Button
             variant="contained"
             onClick={exportFile}
+            size="small"
             sx={{
               backgroundColor: "#2f575b",
-              height: "70%",
-              width: "40%",
-              marginTop: "1%",
+              width: "80%",
             }}
           >
             Export Data
@@ -258,6 +301,7 @@ export default function DummyData() {
           <TextField
             label="Search..."
             variant="outlined"
+            fullWidth
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             sx={{ height: "70%", width: "100%" }}
@@ -295,16 +339,18 @@ export default function DummyData() {
               label="Phone Number"
               variant="outlined"
               fullWidth
-              {...register("phoneNumber")}
-              required
+              {...register("phoneNumber", {
+                required: phoneRequired,
+              })}
               margin="normal"
             />
             <TextField
               label="Email"
               variant="outlined"
               fullWidth
-              {...register("email")}
-              required
+              {...register("email", {
+                required: emailRequired,
+              })}
               margin="normal"
             />
             <TextField
@@ -318,10 +364,30 @@ export default function DummyData() {
               label="Designation"
               variant="outlined"
               fullWidth
-              {...register("designation")}
+              {...register("designation", { required: DesignationRequired })}
               required
               margin="normal"
             />
+            <Box>
+              <Typography variant="h6">Status</Typography>
+              <Controller
+                name="Status"
+                control={control}
+                defaultValue={
+                  editingData && editingData.Status !== undefined
+                    ? editingData.Status
+                    : false
+                }
+                render={({ field }) => (
+                  <Switch
+                    {...field}
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    color="primary"
+                  />
+                )}
+              />
+            </Box>
             <input type="file" accept="image/*" onChange={handleFileChange} />
             <Button
               type="submit"
@@ -334,7 +400,7 @@ export default function DummyData() {
         </Box>
       </Modal>
 
-      <Paper style={{ height: 500, width: "100%" }}>
+      <Paper style={{ height: 490, width: "100%" }}>
         <TableVirtuoso
           data={paginatedData}
           components={VirtuosoTableComponents}
@@ -358,6 +424,11 @@ export default function DummyData() {
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
         message="Action successful!"
+      />
+      <DeleteModal
+        open={deleteModalOpen}
+        handleClose={cancelDelete}
+        handleConfirm={confirmDelete}
       />
 
       <SendSMSModal

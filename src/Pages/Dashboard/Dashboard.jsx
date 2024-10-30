@@ -16,9 +16,7 @@ const Dashboard = () => {
       <LeftSideNav>
         <Box sx={styles.mainContainer}>
           <Box component="main" sx={styles.contentArea}>
-            <Box sx={styles.card}>
-              <SMSCostCard />
-            </Box>
+            <SMSCostCard />
 
             <Box sx={styles.chartContainer}>
               <Box sx={styles.cardContainer}>

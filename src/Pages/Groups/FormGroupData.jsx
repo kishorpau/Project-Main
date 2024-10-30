@@ -187,9 +187,6 @@ export default function FormGroupData() {
     setSmsModalOpen(false);
   };
   const handleSendSMSMessage = () => {
-    selectedUsers.forEach((user) =>
-      console.log(`Sending SMS to ${user["Column 2"]}: ${smsMessage}`)
-    );
     setSmsModalOpen(false);
   };
 
@@ -301,7 +298,7 @@ export default function FormGroupData() {
               </Button>
             </Box>
           </Box>
-          <Box sx={{ height: "450px" }}>
+          <Box sx={{ height: "90%" }}>
             <TableVirtuoso
               data={paginatedData}
               components={VirtuosoTableComponents}
@@ -328,11 +325,20 @@ export default function FormGroupData() {
               itemContent={(index, row) => (
                 <>
                   {columns.map((column) => (
-                    <TableCell key={column.dataKey} align="left">
+                    <TableCell
+                      key={column.dataKey}
+                      align="left"
+                      onClick={() =>
+                        column.dataKey !== "select" && handleSelectUser(row)
+                      }
+                    >
                       {column.dataKey === "select" ? (
                         <Checkbox
                           checked={row.selected || false}
-                          onChange={() => handleSelectUser(row)}
+                          onChange={(event) => {
+                            event.stopPropagation();
+                            handleSelectUser(row);
+                          }}
                           color="default"
                         />
                       ) : column.dataKey === "Column 1" ? (
@@ -349,7 +355,7 @@ export default function FormGroupData() {
                 </>
               )}
             />
-            <Box sx={{ background: "white", borderRadius: "0px 0px 5px 5px" }}>
+            <Box sx={{ background: "#fff", borderRadius: "0px 0px 5px 5px" }}>
               <TablePagination
                 rowsPerPageOptions={[5, 10, 25, 50]}
                 component="div"

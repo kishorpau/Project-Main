@@ -39,7 +39,10 @@ function NavBar() {
   };
 
   return (
-    <AppBar position="sticky" sx={{ backgroundColor: "#024950" }}>
+    <AppBar
+      position="sticky"
+      sx={{ backgroundColor: "#024950", boxShadow: "none" }}
+    >
       <Container maxWidth="xl">
         <Toolbar disableGutters>
           <SmsIcon sx={{ display: { xs: "none", md: "flex" }, mr: 1 }} />

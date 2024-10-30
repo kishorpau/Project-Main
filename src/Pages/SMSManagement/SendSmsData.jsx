@@ -18,23 +18,35 @@ import {
   IconButton,
   Modal,
   Checkbox,
+  Chip,
+  Switch,
 } from "@mui/material";
-import { useForm } from "react-hook-form";
+import {
+  emailRequired,
+  emailInvalid,
+  phoneRequired,
+  phoneInvalid,
+  DesignationRequired,
+} from "../../utils/constants/form/index";
+import { set, useForm, Controller } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import useFetch from "../../hooks/useFetch";
 import SendSMSModal from "../../components/SendSMSModal/SendSMSModal";
+import DeleteModal from "../../components/DeleteModal/DeleteModal";
+import GreenSwitchComponent from "../../components/GreenSwitch/GreenSwitchComponent";
 
 const columns = [
   { width: 50, label: "Select", dataKey: "select" },
   { width: 50, label: "ID", dataKey: "id" },
   { width: 100, label: "Photo", dataKey: "Column 1" },
+  { width: 100, label: "Status", dataKey: "Status" },
   { width: 150, label: "Full Name", dataKey: "Column 2" },
   { width: 150, label: "Phone", dataKey: "Column 3" },
   { width: 200, label: "Email", dataKey: "Column 4" },
   { width: 150, label: "Alt. Phone", dataKey: "Column 5" },
   { width: 150, label: "Designation", dataKey: "Column 6" },
-  { width: 100, label: "Actions", dataKey: "actions" },
+  { width: 110, label: "Actions", dataKey: "actions" },
 ];
 
 const VirtuosoTableComponents = {
@@ -88,11 +100,19 @@ function rowContent(index, row, handleDelete, handleEdit, handleSelectUser) {
   return (
     <>
       {columns.map((column) => (
-        <TableCell key={column.dataKey} align="left">
+        <TableCell
+          key={column.dataKey}
+          align="left"
+          onClick={() => column.dataKey !== "select" && handleSelectUser(row)}
+          style={{ cursor: "pointer" }}
+        >
           {column.dataKey === "select" ? (
             <Checkbox
               checked={row.selected || false}
-              onChange={() => handleSelectUser(row)}
+              onChange={(event) => {
+                event.stopPropagation();
+                handleSelectUser(row);
+              }}
               color="default"
             />
           ) : column.dataKey === "Column 1" ? (
@@ -103,13 +123,32 @@ function rowContent(index, row, handleDelete, handleEdit, handleSelectUser) {
             />
           ) : column.dataKey === "actions" ? (
             <Box>
-              <IconButton onClick={() => handleEdit(row)}>
+              <IconButton
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleEdit(row);
+                }}
+              >
                 <EditIcon />
               </IconButton>
-              <IconButton onClick={() => handleDelete(row.id)}>
+              <IconButton
+                onClick={(event) => {
+                  event.stopPropagation();
+                  handleDelete(row.id);
+                }}
+              >
                 <DeleteIcon />
               </IconButton>
             </Box>
+          ) : column.dataKey === "Status" ? (
+            <Chip
+              label={row.Status ? "Active" : "Inactive"}
+              color={row.Status ? "success" : "default"}
+              sx={{
+                backgroundColor: row.Status ? "success.main" : "#f44336",
+                color: "white",
+              }}
+            />
           ) : (
             row[column.dataKey]
           )}
@@ -124,13 +163,16 @@ export default function SendSmsData() {
   const [open, setOpen] = useState(false);
   const [smsModalOpen, setSmsModalOpen] = useState(false);
   const [smsMessage, setSmsMessage] = useState("");
-  const [editingData, setEditingData] = useState(null);
+  const [editingData, setEditingData] = useState(false);
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState([]);
   const [uploadedImage, setUploadedImage] = useState(null);
   const [page, setPage] = useState(0);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { register, handleSubmit, reset, setValue } = useForm();
+  const { register, handleSubmit, reset, setValue, getValues, control } =
+    useForm();
 
   useEffect(() => {
     setPage(0);
@@ -141,7 +183,18 @@ export default function SendSmsData() {
   );
 
   const handleDelete = (id) => {
-    deleteData(id);
+    setUserIdToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    deleteData(userIdToDelete);
+    setDeleteModalOpen(false);
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setUserIdToDelete(null);
   };
 
   const handleEdit = (row) => {
@@ -152,6 +205,8 @@ export default function SendSmsData() {
     setValue("email", row["Column 4"]);
     setValue("altPhone", row["Column 5"]);
     setValue("designation", row["Column 6"]);
+    setValue("Status", row["Status"]);
+    setValue("photo", row["Column 1"]);
   };
 
   const onSubmit = async (formData) => {
@@ -161,8 +216,8 @@ export default function SendSmsData() {
       "Column 4": formData.email,
       "Column 5": formData.altPhone || "N/A",
       "Column 6": formData.designation,
-      "Column 1":
-        uploadedImage || formData.photo || "https://via.placeholder.com/50",
+      Status: formData.Status,
+      "Column 1": { uploadedImage } || "https://via.placeholder.com/50",
     };
 
     if (editingData) {
@@ -172,10 +227,10 @@ export default function SendSmsData() {
     }
 
     reset();
-    handleClose();
+    setOpen(false);
     setSnackbarOpen(true);
+    setEditingData(false);
   };
-
   const handleFileChange = (event) => {
     const file = event.target.files[0];
     if (file) {
@@ -235,9 +290,6 @@ export default function SendSmsData() {
   const handleCloseSmsModal = () => setSmsModalOpen(false);
 
   const handleSendSMSMessage = () => {
-    selectedUsers.forEach((user) =>
-      console.log(`Sending SMS to ${user["Column 2"]}: ${smsMessage}`)
-    );
     setSmsModalOpen(false);
     setSnackbarOpen(true);
   };
@@ -259,7 +311,8 @@ export default function SendSmsData() {
       <Box
         sx={{
           display: "flex",
-          gap: "40%",
+          justifyContent: "space-between",
+          padding: "1%",
         }}
       >
         <Typography variant="h5" color="#2f575b">
@@ -269,11 +322,11 @@ export default function SendSmsData() {
           <Button
             variant="contained"
             onClick={handleOpen}
+            size="small"
             sx={{
               backgroundColor: "#2f575b",
-              height: "70%",
-              width: "50%",
-              marginTop: "1%",
+
+              width: "60%",
             }}
           >
             {editingData ? "Edit Person" : "Add new person"}
@@ -281,11 +334,10 @@ export default function SendSmsData() {
           <Button
             variant="contained"
             onClick={handleOpenSmsModal}
+            size="small"
             sx={{
               backgroundColor: "#2f575b",
-              height: "70%",
-              width: "50%",
-              marginTop: "1%",
+              width: "60%",
             }}
           >
             Send SMS to Selected
@@ -334,16 +386,18 @@ export default function SendSmsData() {
               label="Phone Number"
               variant="outlined"
               fullWidth
-              {...register("phoneNumber")}
-              required
+              {...register("phoneNumber", {
+                required: phoneRequired,
+              })}
               margin="normal"
             />
             <TextField
               label="Email"
               variant="outlined"
               fullWidth
-              {...register("email")}
-              required
+              {...register("email", {
+                required: emailRequired,
+              })}
               margin="normal"
             />
             <TextField
@@ -357,10 +411,31 @@ export default function SendSmsData() {
               label="Designation"
               variant="outlined"
               fullWidth
-              {...register("designation")}
+              {...register("designation", { required: DesignationRequired })}
               required
               margin="normal"
             />
+            <Box>
+              <Typography variant="h6">Status</Typography>
+              <Controller
+                name="Status"
+                control={control}
+                defaultValue={
+                  editingData && editingData.Status !== undefined
+                    ? editingData.Status
+                    : false
+                }
+                render={({ field }) => (
+                  <Switch
+                    {...field}
+                    checked={field.value}
+                    onChange={(e) => field.onChange(e.target.checked)}
+                    color="primary"
+                  />
+                )}
+              />
+            </Box>
+
             <input type="file" accept="image/*" onChange={handleFileChange} />
             <Button
               type="submit"
@@ -373,7 +448,7 @@ export default function SendSmsData() {
         </Box>
       </Modal>
 
-      <Paper style={{ height: 500, width: "100%" }}>
+      <Paper style={{ height: 490, width: "100%" }}>
         <TableVirtuoso
           data={paginatedData}
           components={VirtuosoTableComponents}
@@ -399,6 +474,11 @@ export default function SendSmsData() {
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
         message="Action successful!"
+      />
+      <DeleteModal
+        open={deleteModalOpen}
+        handleClose={cancelDelete}
+        handleConfirm={confirmDelete}
       />
 
       <SendSMSModal

@@ -10,6 +10,12 @@ import {
   Snackbar,
   Alert,
 } from "@mui/material";
+import {
+  emailRequired,
+  emailInvalid,
+  passwordRequired,
+  authSuccessMessage,
+} from "../../utils/constants/form/index";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 
@@ -54,10 +60,10 @@ const Auth = () => {
               margin="normal"
               variant="outlined"
               {...register("email", {
-                required: "Email is required",
+                required: emailRequired,
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: "Invalid email address",
+                  message: emailInvalid,
                 },
               })}
               error={!!errors.email}
@@ -69,7 +75,7 @@ const Auth = () => {
               margin="normal"
               variant="outlined"
               type="password"
-              {...register("password", { required: "Password is required" })}
+              {...register("password", { required: passwordRequired })}
               error={!!errors.password}
               helperText={errors.password ? errors.password.message : ""}
             />
@@ -96,7 +102,7 @@ const Auth = () => {
           severity="success"
           sx={{ width: "100%" }}
         >
-          Sign in successful!
+          {authSuccessMessage}
         </Alert>
       </Snackbar>
     </Box>

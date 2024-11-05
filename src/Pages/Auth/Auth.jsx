@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Card,
@@ -11,13 +11,23 @@ import {
   Alert,
 } from "@mui/material";
 import {
-  emailRequired,
-  emailInvalid,
-  passwordRequired,
-  authSuccessMessage,
+  EMAIL_REQUIRED,
+  EMAIL_INVALID,
+  PASSWORD_REQUIRED,
+  AUTH_SUCCESS_MESSAGE,
 } from "../../utils/constants/form/index";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
+
+const authenticateUser = async (email, password) => {
+  if (email === "admin@example.com" && password === "admin") {
+    return { role: "admin" };
+  } else if (email === "user@example.com" && password === "user") {
+    return { role: "user" };
+  } else {
+    throw new Error("Invalid credentials");
+  }
+};
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -26,15 +36,24 @@ const Auth = () => {
     handleSubmit,
     formState: { errors },
   } = useForm();
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState(AUTH_SUCCESS_MESSAGE);
 
-  const [openSnackbar, setOpenSnackbar] = React.useState(false);
+  const onSubmit = async (data) => {
+    try {
+      const response = await authenticateUser(data.email, data.password);
+      localStorage.setItem("user", JSON.stringify({ role: response.role }));
+      setOpenSnackbar(true);
 
-  const onSubmit = (data) => {
-    console.log(data);
-    setOpenSnackbar(true);
-    setTimeout(() => {
-      navigate("/dashboard");
-    }, 1000);
+      if (response.role === "admin") {
+        navigate("/Offices");
+      } else if (response.role === "user") {
+        navigate("/Dashboard");
+      }
+    } catch (error) {
+      setSnackbarMessage(error.message);
+      setOpenSnackbar(true);
+    }
   };
 
   const handleCloseSnackbar = () => {
@@ -60,10 +79,10 @@ const Auth = () => {
               margin="normal"
               variant="outlined"
               {...register("email", {
-                required: emailRequired,
+                required: EMAIL_REQUIRED,
                 pattern: {
                   value: /^\S+@\S+$/i,
-                  message: emailInvalid,
+                  message: EMAIL_INVALID,
                 },
               })}
               error={!!errors.email}
@@ -75,7 +94,7 @@ const Auth = () => {
               margin="normal"
               variant="outlined"
               type="password"
-              {...register("password", { required: passwordRequired })}
+              {...register("password", { required: PASSWORD_REQUIRED })}
               error={!!errors.password}
               helperText={errors.password ? errors.password.message : ""}
             />
@@ -99,10 +118,12 @@ const Auth = () => {
       >
         <Alert
           onClose={handleCloseSnackbar}
-          severity="success"
+          severity={
+            snackbarMessage === AUTH_SUCCESS_MESSAGE ? "success" : "error"
+          }
           sx={{ width: "100%" }}
         >
-          {authSuccessMessage}
+          {snackbarMessage}
         </Alert>
       </Snackbar>
     </Box>

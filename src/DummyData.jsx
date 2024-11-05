@@ -21,11 +21,9 @@ import { TablePagination, Chip, Switch } from "@mui/material";
 import SendSMSModal from "./components/SendSMSModal/SendSMSModal";
 import DeleteModal from "./components/DeleteModal/DeleteModal";
 import {
-  emailRequired,
-  emailInvalid,
-  phoneRequired,
-  phoneInvalid,
-  DesignationRequired,
+  EMAIL_REQUIRED,
+  PHONE_REQUIRED,
+  DESIGNATION_REQUIRED,
 } from "../src/utils/constants/form/index";
 const columns = [
   { width: 40, label: "ID", dataKey: "id" },
@@ -340,7 +338,7 @@ export default function DummyData() {
               variant="outlined"
               fullWidth
               {...register("phoneNumber", {
-                required: phoneRequired,
+                required: PHONE_REQUIRED,
               })}
               margin="normal"
             />
@@ -349,7 +347,7 @@ export default function DummyData() {
               variant="outlined"
               fullWidth
               {...register("email", {
-                required: emailRequired,
+                required: EMAIL_REQUIRED,
               })}
               margin="normal"
             />
@@ -364,7 +362,7 @@ export default function DummyData() {
               label="Designation"
               variant="outlined"
               fullWidth
-              {...register("designation", { required: DesignationRequired })}
+              {...register("designation", { required: DESIGNATION_REQUIRED })}
               required
               margin="normal"
             />

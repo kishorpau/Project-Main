@@ -22,11 +22,9 @@ import {
   Switch,
 } from "@mui/material";
 import {
-  emailRequired,
-  emailInvalid,
-  phoneRequired,
-  phoneInvalid,
-  DesignationRequired,
+  EMAIL_REQUIRED,
+  PHONE_REQUIRED,
+  DESIGNATION_REQUIRED,
 } from "../../utils/constants/form/index";
 import { set, useForm, Controller } from "react-hook-form";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -34,7 +32,6 @@ import EditIcon from "@mui/icons-material/Edit";
 import useFetch from "../../hooks/useFetch";
 import SendSMSModal from "../../components/SendSMSModal/SendSMSModal";
 import DeleteModal from "../../components/DeleteModal/DeleteModal";
-import GreenSwitchComponent from "../../components/GreenSwitch/GreenSwitchComponent";
 
 const columns = [
   { width: 50, label: "Select", dataKey: "select" },
@@ -387,7 +384,7 @@ export default function SendSmsData() {
               variant="outlined"
               fullWidth
               {...register("phoneNumber", {
-                required: phoneRequired,
+                required: PHONE_REQUIRED,
               })}
               margin="normal"
             />
@@ -396,7 +393,7 @@ export default function SendSmsData() {
               variant="outlined"
               fullWidth
               {...register("email", {
-                required: emailRequired,
+                required: EMAIL_REQUIRED,
               })}
               margin="normal"
             />
@@ -411,7 +408,7 @@ export default function SendSmsData() {
               label="Designation"
               variant="outlined"
               fullWidth
-              {...register("designation", { required: DesignationRequired })}
+              {...register("designation", { required: DESIGNATION_REQUIRED })}
               required
               margin="normal"
             />

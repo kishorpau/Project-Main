@@ -5,50 +5,47 @@ import Analytics from "./Pages/Dashboard/Analytics";
 import Groups from "./Pages/Groups/Groups";
 import SendSms from "./Pages/SMSManagement/SendSms";
 import SmsHistory from "./Pages/SMSManagement/SmsHistory";
-import Auth from "./Pages/Auth/Auth";
 import PersonForm from "./Pages/PersonForm/PersonForm";
-import OfficeAdmin from "./Pages/OfficeAdmin/OfficeAdmin";
+import Offices from "./Pages/Offices/Offices";
 import NotFound from "./Pages/NotFound/NotFound";
+import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
   },
-  {
-    path: "/Dashboard",
-    element: <Dashboard />,
-  },
 
   {
+    path: "/Dashboard",
+    element: <PrivateRoute element={<Dashboard />} requiredRole="user" />,
+  },
+  {
     path: "/Analytics",
-    element: <Analytics />,
+    element: <PrivateRoute element={<Analytics />} requiredRole="user" />,
   },
   {
     path: "/Groups",
-    element: <Groups />,
+    element: <PrivateRoute element={<Groups />} requiredRole="user" />,
   },
-
   {
     path: "/SendSms",
-    element: <SendSms />,
+    element: <PrivateRoute element={<SendSms />} requiredRole="user" />,
   },
   {
     path: "/SmsHistory",
-    element: <SmsHistory />,
-  },
-  {
-    path: "/Auth",
-    element: <Auth />,
+    element: <PrivateRoute element={<SmsHistory />} requiredRole="user" />,
   },
   {
     path: "/personForm",
-    element: <PersonForm />,
+    element: <PrivateRoute element={<PersonForm />} requiredRole="user" />,
   },
+
   {
-    path: "/OfficeAdmin",
-    element: <OfficeAdmin />,
+    path: "/Offices",
+    element: <PrivateRoute element={<Offices />} requiredRole="admin" />,
   },
+
   {
     path: "*",
     element: <NotFound />,

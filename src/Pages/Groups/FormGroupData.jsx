@@ -25,6 +25,7 @@ import { Edit as EditIcon } from "@mui/icons-material";
 import { Sms as SmsIcon } from "@mui/icons-material";
 import useFetch from "../../hooks/useFetch";
 import SendSMSModal from "../../components/SendSMSModal/SendSMSModal";
+import { PERSON_DATA_URL } from "../../api/api";
 
 const columns = [
   { width: 50, label: "Select", dataKey: "select" },
@@ -76,7 +77,7 @@ export default function FormGroupData() {
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const { data } = useFetch("https://retoolapi.dev/hsSJ5B/data");
+  const { data } = useFetch(PERSON_DATA_URL);
 
   useEffect(() => {
     setPage(0);

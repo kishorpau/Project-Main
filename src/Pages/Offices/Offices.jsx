@@ -1,13 +1,14 @@
 import NavBar from "../../components/NavBar/NavBar";
-import AdminLeftSideNav from "../SuperAdmin/AdminLeftSideNav/AdminLeftSideNav";
+import LeftSideNav from "../../components/LeftSideNav/LeftSideNav";
+import { AdminLeftSideNavPages } from "../SuperAdmin/AdminLeftSideNavPages";
 import DummyOfficeData from "../SuperAdmin/DummyOfficeData";
 const Offices = () => {
   return (
     <>
       <NavBar />
-      <AdminLeftSideNav>
+      <LeftSideNav navItems={AdminLeftSideNavPages}>
         <DummyOfficeData />
-      </AdminLeftSideNav>
+      </LeftSideNav>
     </>
   );
 };

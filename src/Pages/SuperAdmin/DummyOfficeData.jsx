@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useMemo } from "react";
+import { Link } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -22,6 +24,7 @@ import { Edit as EditIcon, Close as CloseIcon } from "@mui/icons-material";
 import useFetch from "../../hooks/useFetch";
 import { useForm } from "react-hook-form";
 import { PROVINCE_DISTRICT_PALIKA_LIST as officedata } from "../../utils/constants/form/AddressData";
+import { OFFICES_URL } from "../../api/api";
 
 const columns = [
   { width: 40, label: "ID", dataKey: "id" },
@@ -54,6 +57,9 @@ const VirtuosoTableComponents = {
   )),
 };
 
+function removeWhiteSpace(str) {
+  return str.replace(/\s+/g, "");
+}
 function fixedHeaderContent() {
   return (
     <TableRow sx={{ backgroundColor: "#024950" }}>
@@ -76,17 +82,18 @@ function rowContent(_index, row, handleEdit) {
       {columns.map((column) => (
         <TableCell key={column.dataKey} align="left">
           {column.dataKey === "actions" ? (
-            <Box
-              sx={{
-                minWidth: "100px",
-                display: "flex",
-                justifyContent: "space-evenly",
-              }}
-            >
+            <Box>
               <IconButton onClick={() => handleEdit(row)}>
                 <EditIcon />
               </IconButton>
             </Box>
+          ) : column.dataKey === "OfficeName" ? (
+            <Link
+              to={`/User/${removeWhiteSpace(row["OfficeName"])}`}
+              style={{ color: "#024950", textDecoration: "none" }}
+            >
+              {row[column.dataKey] || "N/A"}
+            </Link>
           ) : (
             row[column.dataKey] || "N/A"
           )}
@@ -102,14 +109,12 @@ export default function DummyData() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [editingData, setEditingData] = useState(null);
-
   const { register, handleSubmit, reset, setValue } = useForm();
   const [selectedProvince, setSelectedProvince] = useState("");
   const [selectedDistrict, setSelectedDistrict] = useState("");
   const [selectedMunicipality, setSelectedMunicipality] = useState("");
-  const { data, loading, error, createData, updateData } = useFetch(
-    "https://retoolapi.dev/rEoRhA/data"
-  );
+  const { data, loading, error, createData, updateData } =
+    useFetch(OFFICES_URL);
   useEffect(() => {
     setPage(0);
   }, [searchTerm]);

@@ -1,17 +1,18 @@
 const styles = {
   card: {
-    flex: 1,
+    flex: 0.1,
     height: 150,
-    bgcolor: "#f5f5f5",
-    background: "linear-gradient( 135deg, #92FFC0 10%, #002661 100%)",
+    color: "#fff",
+    background: "linear-gradient(135deg, #025050, #028282)",
     boxShadow: 3,
-    borderRadius: 2,
+    borderRadius: 1,
     transition: "transform 0.2s ease-in-out",
     "&:hover": {
       transform: "scale(1.02)",
       boxShadow: "0 6px 16px rgba(0, 0, 0, 0.15)",
     },
-    minWidth: "30%",
+    minWidth: "25%",
+    marginX: "2%",
   },
   title: {
     fontSize: 20,
@@ -23,8 +24,8 @@ const styles = {
   container: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 2,
+    justifyContent: "space-around",
+    gap: 1,
     flexWrap: "wrap",
   },
 };

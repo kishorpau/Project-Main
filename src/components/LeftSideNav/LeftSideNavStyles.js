@@ -33,9 +33,9 @@ export const drawerPaperStyles = {
     md: "80vh",
   },
   top: {
-    xs: "5vh",
-    sm: "8vh",
-    md: "10vh",
+    xs: "5%",
+    sm: "8%",
+    md: "10%",
   },
   position: "fixed",
 };

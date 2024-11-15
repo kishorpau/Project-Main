@@ -5,7 +5,6 @@ const styles = {
     flexGrow: 1,
     width: "100%",
     maxWidth: "100vw",
-    bgcolor: "#f4f6f8",
   },
   chartContainer: {
     display: "flex",

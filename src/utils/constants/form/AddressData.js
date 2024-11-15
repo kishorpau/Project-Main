@@ -311,7 +311,7 @@ export const PROVINCE_DISTRICT_PALIKA_LIST = [
     ],
   },
   {
-    value: "PROVIENCE_2",
+    value: "MADHESH_PROVINCE",
     label: "मधेश प्रदेश",
     districts: [
       //8 districts

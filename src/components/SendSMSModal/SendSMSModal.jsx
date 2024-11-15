@@ -107,7 +107,11 @@ const SendSMSModal = ({
             <Button
               onClick={handleSendSMSMessage}
               variant="contained"
-              sx={{ backgroundColor: "#024950" }}
+              sx={{
+                backgroundColor: "#024950",
+                borderTopRightRadius: "0",
+                borderBottomRightRadius: "0",
+              }}
             >
               Send SMS
             </Button>
@@ -115,6 +119,7 @@ const SendSMSModal = ({
               value={selectedAction}
               onChange={handleActionChange}
               displayEmpty
+              sx={{ borderTopLeftRadius: "0", borderBottomLeftRadius: "0" }}
             >
               <MenuItem value="schedule">Schedule SMS</MenuItem>
             </Select>

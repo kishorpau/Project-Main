@@ -13,7 +13,7 @@ import SmsIcon from "@mui/icons-material/Sms";
 import { AccountCircleRounded } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-const settings = ["Profile", "Account", "Dashboard", "Logout"];
+const settings = ["Profile", "Settings", "Dashboard", "Logout"];
 
 function NavBar() {
   const navigate = useNavigate();
@@ -32,9 +32,14 @@ function NavBar() {
   };
 
   const handleCloseUserMenu = (setting) => {
-    if (setting === "Logout") {
+    if (setting === "Profile") {
+      navigate("/profile");
+    } else if (setting === "Settings") {
+      navigate("/settings");
+    } else if (setting === "Logout") {
       navigate("/");
     }
+
     setAnchorElUser(null);
   };
 

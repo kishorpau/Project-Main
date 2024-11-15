@@ -14,7 +14,7 @@ const PrivateRoute = ({ element, requiredRole }) => {
     return <Navigate to="/" replace />;
   }
 
-  if (requiredRole && role !== requiredRole) {
+  if (requiredRole && !requiredRole.includes(role)) {
     return <Navigate to="/" replace />;
   }
 

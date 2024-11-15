@@ -1,6 +1,7 @@
 import React from "react";
 import { Box, Card, Typography } from "@mui/material";
 import LeftSideNav from "../../components/LeftSideNav/LeftSideNav";
+import { LeftSideNavPages } from "../../components/LeftSideNav/LeftSideNavPages";
 import NavBar from "../../components/NavBar/NavBar";
 import SMSCostCard from "./DashboardComponents/SMSCostCard";
 import MonthlySMSExpensesChart from "../../Charts/MonthlySMSExpensesChart";
@@ -13,7 +14,7 @@ const Dashboard = () => {
   return (
     <>
       <NavBar />
-      <LeftSideNav>
+      <LeftSideNav navItems={LeftSideNavPages}>
         <Box sx={styles.mainContainer}>
           <Box component="main" sx={styles.contentArea}>
             <SMSCostCard />

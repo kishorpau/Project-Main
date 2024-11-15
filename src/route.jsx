@@ -8,12 +8,28 @@ import SmsHistory from "./Pages/SMSManagement/SmsHistory";
 import PersonForm from "./Pages/PersonForm/PersonForm";
 import Offices from "./Pages/Offices/Offices";
 import NotFound from "./Pages/NotFound/NotFound";
+import SMSCredit from "./Pages/SMSManagement/SMSCredit/SMSCredit";
 import PrivateRoute from "./components/PrivateRoute/PrivateRoute";
+import AdminUserList from "./Pages/AdminUserList/AdminUserList";
+import Settings from "./Pages/Settings/Settings";
+import Profile from "./Pages/Profile/Profile";
 
 export const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+  },
+  {
+    path: "/settings",
+    element: (
+      <PrivateRoute element={<Settings />} requiredRole={["user", "admin"]} />
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <PrivateRoute element={<Profile />} requiredRole={["user", "admin"]} />
+    ),
   },
 
   {
@@ -44,6 +60,14 @@ export const router = createBrowserRouter([
   {
     path: "/Offices",
     element: <PrivateRoute element={<Offices />} requiredRole="admin" />,
+  },
+  {
+    path: "/User/:Office/",
+    element: <PrivateRoute element={<AdminUserList />} requiredRole="admin" />,
+  },
+  {
+    path: "/User/:Office/SMSCredit",
+    element: <PrivateRoute element={<SMSCredit />} requiredRole="admin" />,
   },
 
   {

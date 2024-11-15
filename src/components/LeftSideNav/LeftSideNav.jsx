@@ -4,7 +4,6 @@ import {
   Drawer,
   Button,
   List,
-  Divider,
   ListItem,
   ListItemButton,
   ListItemIcon,
@@ -12,7 +11,6 @@ import {
   useMediaQuery,
 } from "@mui/material";
 import { Link, useLocation } from "react-router-dom";
-import { LeftSideNavPages } from "./LeftSideNavPages";
 import {
   listItemButtonStyles,
   linkStyles,
@@ -22,7 +20,7 @@ import {
 
 const drawerWidth = 180;
 
-export default function LeftSideNav({ children }) {
+export default function LeftSideNav({ children, navItems = [] }) {
   const [isDrawerOpen, setDrawerOpen] = useState(false);
   const isLargeScreen = useMediaQuery("(min-width:600px)");
   const location = useLocation();
@@ -39,8 +37,8 @@ export default function LeftSideNav({ children }) {
   const getPath = (text) => `/${text}`.toLowerCase();
   const isActivePath = (path) => location.pathname.toLowerCase() === path;
 
-  const renderListItems = (items) =>
-    items.map(({ text, icon, path }) => {
+  const renderListItems = () =>
+    navItems.map(({ text, icon, path }) => {
       const fullpath = getPath(path);
       const isActive = isActivePath(fullpath);
       return (
@@ -62,7 +60,7 @@ export default function LeftSideNav({ children }) {
       onClick={toggleDrawer(false)}
       onKeyDown={toggleDrawer(false)}
     >
-      <List>{renderListItems(LeftSideNavPages)}</List>
+      <List>{renderListItems()}</List>
     </Box>
   );
 

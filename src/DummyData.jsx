@@ -25,6 +25,7 @@ import {
   PHONE_REQUIRED,
   DESIGNATION_REQUIRED,
 } from "../src/utils/constants/form/index";
+import { PERSON_DATA_URL } from "./api/api";
 const columns = [
   { width: 40, label: "ID", dataKey: "id" },
   { width: 100, label: "Photo", dataKey: "Column 1" },
@@ -137,9 +138,8 @@ export default function DummyData() {
     setPage(0);
   }, [searchTerm]);
 
-  const { data, createData, updateData, deleteData } = useFetch(
-    "https://retoolapi.dev/hsSJ5B/data"
-  );
+  const { data, createData, updateData, deleteData } =
+    useFetch(PERSON_DATA_URL);
 
   const handleDelete = (id) => {
     setUserIdToDelete(id);

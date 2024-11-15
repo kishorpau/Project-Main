@@ -32,6 +32,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import useFetch from "../../hooks/useFetch";
 import SendSMSModal from "../../components/SendSMSModal/SendSMSModal";
 import DeleteModal from "../../components/DeleteModal/DeleteModal";
+import { PERSON_DATA_URL } from "../../api/api";
 
 const columns = [
   { width: 50, label: "Select", dataKey: "select" },
@@ -175,9 +176,8 @@ export default function SendSmsData() {
     setPage(0);
   }, [searchTerm]);
 
-  const { data, loading, error, createData, updateData, deleteData } = useFetch(
-    "https://retoolapi.dev/hsSJ5B/data"
-  );
+  const { data, loading, error, createData, updateData, deleteData } =
+    useFetch(PERSON_DATA_URL);
 
   const handleDelete = (id) => {
     setUserIdToDelete(id);
